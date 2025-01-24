@@ -1,0 +1,3 @@
+[language-server.vuels]
+command = "node_modules/.bin/vue-language-server"
+args = ["--stdio"]
