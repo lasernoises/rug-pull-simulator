@@ -16,7 +16,19 @@ export type Econ = {
 
   food: number;
   bubbles: number;
+
+  bubble_value: number;
 };
+
+export function econ(pos: Vec2, velocity: Vec2): Econ {
+  return {
+    pos,
+    velocity,
+    food: 0,
+    bubbles: 0,
+    bubble_value: 0,
+  };
+}
 
 export type Player = {
   bubbles: number,
@@ -31,18 +43,16 @@ export type State = {
 export function init(): State {
   return reactive({
     econs: 
-      [...Array(Math.round(Math.random() * 32)).keys()].map(() => ({
-        pos: {
+      [...Array(Math.round(Math.random() * 32)).keys()].map(() => econ(
+        {
           x: Math.random() * 1024 - 512,
           y: Math.random() * 1024 - 512,
         },
-        velocity: {
+        {
           x: Math.random() * 2 - 1,
           y: Math.random() * 2 - 1,
         },
-        food: 2,
-        bubbles: 0,
-      })).filter(e => length(e.pos) < 512),
+      )).filter(e => length(e.pos) < 512),
 
       // [
       //   {
@@ -121,6 +131,17 @@ export function tick(state: State) {
     econ.pos.x += econ.velocity.x;
     econ.pos.y += econ.velocity.y;
   }
+}
+
+function trade(a: Econ, b: Econ) {
+  // when does a trade happen?
+  // i guess when one has too many and one has too little
+  // the idea for now is to also use the value as the ammount the econ wants.
+  // at that point an exchange rate needs to be determined.
+  // sale only happens if the seller has a lower value than the buyer.
+  // at that point we use the price of the seller.
+  // const value = Math.min(a.bubble_value, b.bubble_value);
+    // const ammount = a.;
 }
 
 export function availableMarketingDevices(player: Player) {

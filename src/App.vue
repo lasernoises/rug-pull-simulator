@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, computed, ref, watch } from "vue";
-import { dbg, init, tick, availableMarketingDevices, type Vec2 } from "./state.ts";
+import { dbg, init, tick, econ, availableMarketingDevices, type Vec2 } from "./state.ts";
 
 const state = init();
 
@@ -50,12 +50,10 @@ const marketingDevices = computed(() => availableMarketingDevices(state.player))
 const place = () => {
   const pos = mousePos.value!;
   
-  state.econs.push({
+  state.econs.push(econ(
     pos,
-    velocity: {x: 1, y: 1, },
-    food: 0,
-    bubbles: 0,
-  });
+    {x: 1, y: 1, },
+  ));
 };
 
 </script>
