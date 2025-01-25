@@ -106,7 +106,7 @@ const reset = () => {
 };
 
 const max_price = computed(() => {
-  return Math.max(1, ...state.value.price_history);
+  return Math.max(0, ...state.value.price_history);
 });
 </script>
 
@@ -229,7 +229,8 @@ const max_price = computed(() => {
       Avg. Value: {{ avgValue }}
       <br>
       <br>
-      Bubble Stockpile: {{ state.player.bubbles }}
+      Bubble Stockpile: {{ state.player.bubbles }} <br/>
+      Food: {{ state.player.food }}
       <br>
       <button
         @click="placing === 'bubbles' ? placing = null : placing = 'bubbles'"

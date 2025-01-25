@@ -14,6 +14,10 @@ export default defineConfig({
     host: "0.0.0.0",
     hmr: true,
   },
+  base: "./",
+  build: {
+    outDir: "docs",
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
