@@ -139,10 +139,6 @@ export function tick(state: State) {
 
       if (i === j) continue;
 
-      const tmp = econ.velocity;
-      econ.velocity = other.velocity;
-      other.velocity = tmp;
-
       // if (length(sub(econ.pos, other.pos)) < 64) {
       //   econ.velocity = {x: 0, y: 0};
       // }
