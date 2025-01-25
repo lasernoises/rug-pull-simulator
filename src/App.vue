@@ -113,6 +113,18 @@ const reset = () => {
           :fill="`rgb(${econ.food}, ${econ.bubbles}, ${econ.bubble_value})`"
           r="16"
         ></circle>
+        <text
+          :x="econ.pos.x - 10"
+          :y="econ.pos.y"
+          fill="lightgreen"
+          style="font-size: 12px"
+        >{{ econ.bubbles }}/{{ Math.round(econ.bubble_value) }}</text>
+        <text
+          :x="econ.pos.x - 8"
+          :y="econ.pos.y + 12"
+          fill="white"
+          style="font-size: 12px"
+        >{{ econ.food }}</text>
       </template>
 
       <template
