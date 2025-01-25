@@ -241,7 +241,7 @@ function trade(state: State, a: Econ, b: Econ) {
     Math.ceil(buyer.bubble_value) - buyer.bubbles,
     Math.floor(buyer.food / price),
     seller.bubbles - Math.ceil(seller.bubble_value),
-  );
+c  );
   console.log(`Trading amount ${amount}`);
 
   if (amount === 0) {

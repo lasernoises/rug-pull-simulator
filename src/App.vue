@@ -69,6 +69,9 @@ const place = () => {
 
   switch (placing.value) {
     case "bubbles":
+      if (state.value.player.bubbles === 0) {
+        return;
+      }
       state.value.bubbles.push(pos);
       state.value.player.bubbles -= 1;
       return;
