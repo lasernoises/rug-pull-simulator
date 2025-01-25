@@ -251,7 +251,7 @@ const max_price = computed(() => {
           :points="
             '256,128 0,128 '
               + state.price_history
-                  .map((p, i) => `${256 / state.price_history.length * i},${128 - p / max_price * 128}` )
+                  .map((p, i) => `${256 / (state.price_history.length - 1) * i},${128 - p / max_price * 128}` )
                   .join(' ')
           "
           fill="white"
