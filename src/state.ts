@@ -209,9 +209,8 @@ function trade(state: State, a: Econ, b: Econ) {
   // sale only happens if the seller has a lower value than the buyer.
   // at that point we use the price of the seller.
 
+  let buyer;
   let seller;
-
-  console.log(`${a} trades with ${b}`);  let buyer;
 
   if (a.bubbles > a.bubble_value && b.bubbles < b.bubble_value) {
     seller = a;
