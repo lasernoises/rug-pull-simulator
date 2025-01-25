@@ -156,7 +156,9 @@ export function tick(state: State) {
 
     for (const j in state.billboards) {
       const billboard = state.billboards[j];
-      econ.bubble_value += params.billboard_influence_strength;
+      if(length(sub(econ.pos, billboard)) < params.billboard_influence_radius) {
+        econ.bubble_value += params.billboard_influence_strength;
+      }
     }
 
     for (const j in state.food) {
