@@ -96,7 +96,7 @@ const reset = () => {
 };
 
 const max_price = computed(() => {
-  return Math.max(1, ...state.value.price_history);
+  return Math.max(0, ...state.value.price_history);
 });
 </script>
 
