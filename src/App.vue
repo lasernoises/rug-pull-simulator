@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, computed, ref, watch } from "vue";
-import { dbg, init, tick, econ, params, type Vec2 } from "./state.ts";
+import { dbg, init, tick, econ, random_pos, params, type Vec2 } from "./state.ts";
 import Grave from './Grave.vue';
 
 const state = ref(init());
@@ -63,6 +63,16 @@ const avgValue = computed(
     .reduce((a, b) => a + b, 0)
     / state.value.econs.length,
 );
+
+const bulk_place_bubbles = () => {
+  for (let i = 0; i < params.bubbles_bulk_place_amount; i++) {
+    if (state.value.player.bubbles === 0) {
+      return;
+    }
+    state.value.bubbles.push(random_pos());
+    state.value.player.bubbles -= 1;
+  }
+};
 
 const place = () => {
   const pos = mousePos.value!;
@@ -225,6 +235,9 @@ const max_price = computed(() => {
         @click="placing === 'bubbles' ? placing = null : placing = 'bubbles'"
       >Place Bubbles</button>
       <br>
+      <button
+        @click="bulk_place_bubbles"
+      >Bulk Place Bubbles</button>
       <br>
       Last Trade: {{ state.last_trade }}
 

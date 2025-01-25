@@ -44,6 +44,7 @@ export const params = reactive({
   econ_bubble_collection_radius: 32,
   econ_food_collection_radius: 64,
   food_value: 12,
+  bubbles_bulk_place_amount: 10,
   billboard_influence_radius: 128,
   billboard_influence_strength: 0.001,
   billboard_price: 20,
@@ -86,7 +87,7 @@ export function init(): State {
   });
 }
 
-function random_pos(): Vec2 {
+export function random_pos(): Vec2 {
   while(true) {
     const pos =  {
       x: Math.random() * 1024 - 512,
