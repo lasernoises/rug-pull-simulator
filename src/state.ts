@@ -1,14 +1,11 @@
 import { reactive } from "vue";
+import type { Vec2 } from "./vector-algebra";
+import { length, sub, rebound, minus } from './vector-algebra';
 
 export function dbg<T>(t: T): T {
   console.log(t);
   return t;
 }
-
-export type Vec2 = {
-  x: number,
-  y: number,
-};
 
 interface Trader {
   food: number;
@@ -122,31 +119,13 @@ function n_random_pos_no_collisions(n: number, entity_min_distance: number): Vec
   return result;
 }
 
-function sub(a: Vec2, b: Vec2): Vec2 {
-  return {
-    x: a.x - b.x,
-    y: a.y - b.y,
-  };
-}
-
-function length(vec: Vec2): number {
-  const x = Math.abs(vec.x);
-  const y = Math.abs(vec.y);
-  return Math.abs(Math.sqrt(x * x + y * y));
-} 
-
-function scalarProduct(v1: Vec2, v2: Vec2): number {
-  return v1.x * v2.x + v1.y * v2.y;
-}
-
 export function tick(state: State) {
   for (const i in state.econs) {
     const econ = state.econs[i];
 
 
     if (length(econ.pos) > 512) {
-      econ.velocity.x = -econ.velocity.x;
-      econ.velocity.y = -econ.velocity.y;
+      econ.velocity = rebound(econ.velocity, minus(econ.pos));
     }
 
     for (const j in state.econs) {
