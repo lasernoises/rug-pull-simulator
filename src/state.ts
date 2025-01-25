@@ -54,6 +54,7 @@ export const params = reactive({
 export type State = {
   player: Player,
   econs: Econ[],
+  dead_econs: Econ[],
   billboards: Vec2[],
   food: Vec2[],
   bubbles: Vec2[],
@@ -81,6 +82,7 @@ export function init(): State {
           y: Math.random() * 2 - 1,
         },
       )),
+    dead_econs: [],
   });
 }
 
@@ -195,6 +197,13 @@ export function tick(state: State) {
       };
     }
   }
+
+  let alive_econs = [];
+  state.econs.forEach(e => {
+    if(e.food > 0) alive_econs.push(e);
+    else state.dead_econs.push(e);
+  });
+  state.econs = alive_econs;
 
   if (Math.random() < params.food_spawn_chance) {
     state.food.push(random_pos());

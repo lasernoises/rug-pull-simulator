@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, computed, ref, watch } from "vue";
 import { dbg, init, tick, econ, params, type Vec2 } from "./state.ts";
+import Grave from './Grave.vue';
 
 const state = ref(init());
 
@@ -125,6 +126,15 @@ const reset = () => {
           fill="white"
           style="font-size: 12px"
         >{{ econ.food }}</text>
+      </template>
+
+      <template
+        v-for="econ in state.dead_econs"
+      >
+        <Grave
+          :cx="econ.pos.x"
+          :cy="econ.pos.y"
+        ></Grave>
       </template>
 
       <template
