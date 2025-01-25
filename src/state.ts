@@ -240,6 +240,7 @@ function trade(state: State, a: Econ, b: Econ) {
   const amount = Math.min(
     Math.ceil(buyer.bubble_value) - buyer.bubbles,
     Math.floor(buyer.food / price),
+    seller.bubbles - Math.ceil(seller.bubble_value),
   );
   console.log(`Trading amount ${amount}`);
 
