@@ -91,6 +91,10 @@ const place = () => {
 const reset = () => {
   state.value = init();
 };
+
+const max_price = computed(() => {
+  return Math.max(1, ...state.value.price_history);
+});
 </script>
 
 <template>
@@ -221,14 +225,19 @@ const reset = () => {
       <br>
       Last Trade: {{ state.last_trade }}
 
-      <svg v-if="state.price_history.length > -1">
+      <svg
+        v-if="state.price_history.length > -1"
+        width="256"
+        height="128"
+      >
         <polygon
           :points="
-            '200,300 0,300 '
+            '256,128 0,128 '
               + state.price_history
-                  .map((p, i) => `${200 / state.price_history.length * i},${300 - p}` )
+                  .map((p, i) => `${256 / state.price_history.length * i},${128 - p / max_price * 128}` )
                   .join(' ')
           "
+          fill="white"
         ></polygon>
       </svg>
       <br>

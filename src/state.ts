@@ -36,7 +36,7 @@ export type Player = {
 };
 
 export const params = reactive({
-  food_spawn_chance: 0.01,
+  food_spawn_chance: 0.02,
   player_initial_bubbles: 256,
   econ_initial_food: 20,
   econ_min_distance: 32,
@@ -45,7 +45,7 @@ export const params = reactive({
   econ_food_collection_radius: 64,
   food_value: 12,
   billboard_influence_radius: 128,
-  billboard_influence_strength: 0.1,
+  billboard_influence_strength: 0.001,
   billboard_price: 20,
   influencer_price: 50,
   marketinng_point_increment: 20,
