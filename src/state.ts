@@ -10,6 +10,11 @@ export type Vec2 = {
   y: number,
 };
 
+interface Trader {
+  food: number;
+  bubbles: number;
+};
+
 export type Econ = {
   pos: Vec2,
   velocity: Vec2,
@@ -32,12 +37,16 @@ export function econ(pos: Vec2, velocity: Vec2): Econ {
 
 export type Player = {
   bubbles: number,
+  food: number,
+  selling_price: number,
+  buying_price: number,
   marketing_points: number,
 };
 
 export const params = reactive({
   food_spawn_chance: 0.02,
   player_initial_bubbles: 256,
+  market_trade_radius: 40,
   econ_initial_food: 20,
   econ_min_distance: 32,
   econ_velocity_change_chance: 0.01,
@@ -67,6 +76,8 @@ export function init(): State {
     player: {
       bubbles: params.player_initial_bubbles,
       marketing_points: 0,
+      food: 0,
+      buying_price: 0, selling_price: 100,
     },
     billboards: [],
     food: [],
@@ -187,6 +198,10 @@ export function tick(state: State) {
       }
     }
 
+    if (length(econ.pos) < params.market_trade_radius) {
+      trade_with_player(state, econ);
+    }
+
     econ.pos.x += econ.velocity.x;
     econ.pos.y += econ.velocity.y;
 
@@ -207,6 +222,53 @@ export function tick(state: State) {
 
   if (Math.random() < params.food_spawn_chance) {
     state.food.push(random_pos());
+  }
+}
+
+function trade_with_player(state: State, a: Econ) {
+  let seller: Trader;
+  let buyer: Trader;
+  let price: number;
+  let amount: number;
+  if(a.bubbles < a.bubble_value) {
+    // a wants to buy
+    seller = state.player;
+    buyer = a;
+    price = state.player.selling_price;
+    if(a.bubble_value >= price) {
+      amount = Math.min(
+        Math.floor(a.food / state.player.selling_price),
+        Math.ceil(a.bubble_value) - a.bubbles
+      );
+    } else {
+      return;
+    }
+  } else if (a.bubbles > a.bubble_value) {
+    // a wants to sell
+    seller = a;
+    buyer = state.player;
+    price = a.bubble_value;
+    if(price <= state.player.buying_price) {
+      amount = Math.min(
+        state.player.bubbles,
+        Math.floor(a.bubbles - a.bubble_value)
+      )
+    } else {
+      return;
+    }
+  } else {
+    return;
+  }
+
+  seller.food += amount * price;
+  buyer.food -= amount * price;
+  seller.bubbles -= amount;
+  buyer.bubbles += amount;
+
+  if(seller === state.player) {
+    console.log(`You sold ${amount} bubbles for ${amount*price}!`)
+  } else {
+    console.log(`You bought ${amount} bubbles for ${amount*price}!`);
   }
 }
 

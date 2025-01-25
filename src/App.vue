@@ -219,7 +219,8 @@ const max_price = computed(() => {
       Avg. Value: {{ avgValue }}
       <br>
       <br>
-      Bubble Stockpile: {{ state.player.bubbles }}
+      Bubble Stockpile: {{ state.player.bubbles }} <br/>
+      Food: {{ state.player.food }}
       <br>
       <button
         @click="placing === 'bubbles' ? placing = null : placing = 'bubbles'"
