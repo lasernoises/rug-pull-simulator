@@ -47,13 +47,30 @@ const placing = ref<"billboard" | null>(null);
 
 const marketingDevices = computed(() => availableMarketingDevices(state.player));
 
+const avgValue = computed(
+  () => state.econs
+    .map(e => e.bubble_value)
+    .reduce((a, b) => a + b, 0)
+    / state.econs.length,
+);
+
 const place = () => {
   const pos = mousePos.value!;
-  
-  state.econs.push(econ(
-    pos,
-    {x: 1, y: 1, },
-  ));
+
+  switch (placing.value) {
+    case "billboard":
+      state.billboards.push(pos);
+      state.player.marketing_points -= 20;
+      break;
+  }
+
+  placing.value = null;
+
+  // state.econs.push(econ(
+  //   pos,
+  //   {x: 1, y: 1, },
+  // ));
+
 };
 
 </script>
@@ -80,9 +97,32 @@ const place = () => {
         ></circle>
       </template>
 
+      <template
+        v-for="pos in state.billboards"
+      >
+        <circle
+          :cx="pos.x"
+          :cy="pos.y"
+          r="16"
+          fill="red"
+        ></circle>
+      </template>
+
+      <template
+        v-for="pos in state.food"
+      >
+        <circle
+          :cx="pos.x"
+          :cy="pos.y"
+          r="16"
+          fill="yellow"
+        ></circle>
+      </template>
+
+      <circle cx="0" cy="0" r="32" fill="blue"/>
 
       <circle
-        v-if="mousePos !== null"
+        v-if="mousePos !== null && placing === 'billboard'"
         :cx="mousePos.x"
         :cy="mousePos.y"
         r="16"
@@ -93,12 +133,18 @@ const place = () => {
     <div style="flex-grow: 1; width: 100%; height: 100%">
       Marketing Points: {{ state.player.marketing_points }}
       <br>
-      <button @click="state.player.marketing_points += 1">Brainstorm</button>
+      <button @click="state.player.marketing_points += 20">Brainstorm</button>
       <br>
       <br>
-      <button v-if="marketingDevices.billboard" >
+      <button
+        v-if="marketingDevices.billboard"
+        @click="placing = 'billboard'"
+      >
         Deploy Billboard
       </button>
+      <br>
+      <br>
+      Avg. Value: {{ avgValue }}
     </div>
   </div>
 </template>

@@ -36,55 +36,40 @@ export type Player = {
 };
 
 export type State = {
-  econs: Econ[];
   player: Player;
+  econs: Econ[];
+  billboards: Vec2[];
+  food: Vec2[];
 };
 
 export function init(): State {
   return reactive({
-    econs: 
-      [...Array(Math.round(Math.random() * 32)).keys()].map(() => econ(
-        {
-          x: Math.random() * 1024 - 512,
-          y: Math.random() * 1024 - 512,
-        },
-        {
-          x: Math.random() * 2 - 1,
-          y: Math.random() * 2 - 1,
-        },
-      )).filter(e => length(e.pos) < 512),
-
-      // [
-      //   {
-      //     pos: {
-      //       x: -256,
-      //       y: -256,
-      //     },
-      //     velocity: {
-      //       x: 1,
-      //       y: 1,
-      //     },
-      //     food: 2,
-      //     bubbles: 0,
-      //   },
-      //   {
-      //     pos: {
-      //       x: 256,
-      //       y: 256,
-      //     },
-      //     velocity: {
-      //       x: -1,
-      //       y: -1,
-      //     },
-      //     food: 2,
-      //     bubbles: 0,
-      //   }
-      // ],
     player: {
       bubbles: 2048,
       marketing_points: 0,
     },
+    billboards: [],
+    food: [],
+    econs: 
+      [...Array(Math.round(Math.random() * 32)).keys()].map(() => econ(
+        random_pos(),
+        {
+          x: Math.random() * 2 - 1,
+          y: Math.random() * 2 - 1,
+        },
+      )),
   });
+}
+
+function random_pos(): Vec2 {
+  while (true) {
+    const pos =  {
+      x: Math.random() * 1024 - 512,
+      y: Math.random() * 1024 - 512,
+    };
+
+    if (length(pos) < 512) return pos;
+  }
 }
 
 function sub(a: Vec2, b: Vec2): Vec2 {
@@ -125,11 +110,40 @@ export function tick(state: State) {
         const tmp = econ.velocity;
         econ.velocity = other.velocity;
         other.velocity = tmp;
+
+        trade(econ, other);
+      }
+    }
+
+    for (const j in state.billboards) {
+      const billboard = state.billboards[j];
+
+      if (length(sub(econ.pos, billboard)) < 32) {
+        econ.velocity.x = -econ.velocity.x;
+        econ.velocity.y = -econ.velocity.y;
+
+        econ.bubble_value += 1;
+      }
+    }
+
+    for (const j in state.food) {
+      const food = state.food[j];
+
+      if (length(sub(econ.pos, food)) < 32) {
+        econ.food += 1;
+
+        state.food.splice(Number(j), 1);
+
+        break;
       }
     }
 
     econ.pos.x += econ.velocity.x;
     econ.pos.y += econ.velocity.y;
+  }
+
+  if (Math.random() < 0.005) {
+    state.food.push(random_pos());
   }
 }
 
@@ -142,6 +156,7 @@ function trade(a: Econ, b: Econ) {
   // at that point we use the price of the seller.
   // const value = Math.min(a.bubble_value, b.bubble_value);
     // const ammount = a.;
+    //
 }
 
 export function availableMarketingDevices(player: Player) {
