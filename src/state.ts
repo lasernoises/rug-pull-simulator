@@ -36,10 +36,13 @@ export type Player = {
 };
 
 export type State = {
-  player: Player;
-  econs: Econ[];
-  billboards: Vec2[];
-  food: Vec2[];
+  player: Player,
+  econs: Econ[],
+  billboards: Vec2[],
+  food: Vec2[],
+  bubbles: Vec2[],
+  last_trade: { ammount: number, price: number } | null,
+  price_history: number[],
 };
 
 export function init(): State {
@@ -50,8 +53,12 @@ export function init(): State {
     },
     billboards: [],
     food: [],
+    bubbles: [],
+    last_trade: null,
+    price_history: [],
     econs: 
-      [...Array(Math.round(Math.random() * 32)).keys()].map(() => econ(
+      [...Array(32).keys()].map(() => econ(
+      // [...Array(Math.round(Math.random() * 32)).keys()].map(() => econ(
         random_pos(),
         {
           x: Math.random() * 2 - 1,
@@ -111,26 +118,26 @@ export function tick(state: State) {
         econ.velocity = other.velocity;
         other.velocity = tmp;
 
-        trade(econ, other);
+        trade(state, econ, other);
       }
     }
 
     for (const j in state.billboards) {
       const billboard = state.billboards[j];
 
-      if (length(sub(econ.pos, billboard)) < 32) {
-        econ.velocity.x = -econ.velocity.x;
-        econ.velocity.y = -econ.velocity.y;
+      if (length(sub(econ.pos, billboard)) < 128) {
+        // econ.velocity.x = -econ.velocity.x;
+        // econ.velocity.y = -econ.velocity.y;
 
-        econ.bubble_value += 1;
+        econ.bubble_value += 0.1;
       }
     }
 
     for (const j in state.food) {
       const food = state.food[j];
 
-      if (length(sub(econ.pos, food)) < 32) {
-        econ.food += 1;
+      if (length(sub(econ.pos, food)) < 64) {
+        econ.food += 12;
 
         state.food.splice(Number(j), 1);
 
@@ -138,8 +145,27 @@ export function tick(state: State) {
       }
     }
 
+    for (const j in state.bubbles) {
+      const bubble = state.bubbles[j];
+
+      if (length(sub(econ.pos, bubble)) < 32) {
+        econ.bubbles += 1;
+
+        state.bubbles.splice(Number(j), 1);
+
+        break;
+      }
+    }
+
     econ.pos.x += econ.velocity.x;
     econ.pos.y += econ.velocity.y;
+
+    if (Math.random() < 0.01) {
+      econ.velocity = {
+        x: Math.random() * 2 - 1,
+        y: Math.random() * 2 - 1,
+      };
+    }
   }
 
   if (Math.random() < 0.005) {
@@ -147,16 +173,53 @@ export function tick(state: State) {
   }
 }
 
-function trade(a: Econ, b: Econ) {
+function trade(state: State, a: Econ, b: Econ) {
   // when does a trade happen?
   // i guess when one has too many and one has too little
   // the idea for now is to also use the value as the ammount the econ wants.
   // at that point an exchange rate needs to be determined.
   // sale only happens if the seller has a lower value than the buyer.
   // at that point we use the price of the seller.
-  // const value = Math.min(a.bubble_value, b.bubble_value);
-    // const ammount = a.;
-    //
+
+  let seller;
+  let buyer;
+
+  if (a.bubbles > a.bubble_value && b.bubbles < b.bubble_value) {
+    seller = a;
+    buyer = b;
+  } else if (b.bubbles > b.bubble_value && a.bubbles < a.bubble_value) {
+    seller = b;
+    buyer = a;
+  } else {
+    return;
+  }
+
+  if (buyer.food === 0) return;
+
+  const price = seller.bubble_value;
+
+  if (price > buyer.bubble_value) return;
+
+  const ammount = Math.min(
+    Math.ceil(buyer.bubble_value) - buyer.bubbles,
+    Math.floor(buyer.food / price),
+  );
+
+  if (ammount === 0) {
+    return;
+  }
+
+  seller.bubbles -= ammount;
+  buyer.bubbles += ammount;
+
+  buyer.food -= ammount * price;
+  seller.food += ammount * price;
+
+  state.last_trade = {
+    ammount,
+    price,
+  };
+  state.price_history.push(price);
 }
 
 export function availableMarketingDevices(player: Player) {

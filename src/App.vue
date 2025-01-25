@@ -43,7 +43,7 @@ onMounted(() => {
   update();
 });
 
-const placing = ref<"billboard" | null>(null);
+const placing = ref<"bubbles" | "billboard" | null>(null);
 
 const marketingDevices = computed(() => availableMarketingDevices(state.player));
 
@@ -58,6 +58,11 @@ const place = () => {
   const pos = mousePos.value!;
 
   switch (placing.value) {
+    case "bubbles":
+      state.bubbles.push(pos);
+      state.player.bubbles -= 1;
+      return;
+      // break;
     case "billboard":
       state.billboards.push(pos);
       state.player.marketing_points -= 20;
@@ -119,15 +124,38 @@ const place = () => {
         ></circle>
       </template>
 
+      <template
+        v-for="pos in state.bubbles"
+      >
+        <circle
+          :cx="pos.x"
+          :cy="pos.y"
+          r="16"
+          fill="green"
+        ></circle>
+      </template>
+
       <circle cx="0" cy="0" r="32" fill="blue"/>
 
-      <circle
-        v-if="mousePos !== null && placing === 'billboard'"
-        :cx="mousePos.x"
-        :cy="mousePos.y"
-        r="16"
-        @click="place"
-      ></circle>
+      <template v-if="mousePos !== null">
+        <circle
+          v-if="placing === 'billboard'"
+          :cx="mousePos.x"
+          :cy="mousePos.y"
+          r="16"
+          @click="place"
+          fill="red"
+        ></circle>
+
+        <circle
+          v-else-if="placing === 'bubbles'"
+          :cx="mousePos.x"
+          :cy="mousePos.y"
+          r="16"
+          @click="place"
+          fill="green"
+        ></circle>
+      </template>
 
     </svg>
     <div style="flex-grow: 1; width: 100%; height: 100%">
@@ -145,6 +173,27 @@ const place = () => {
       <br>
       <br>
       Avg. Value: {{ avgValue }}
+      <br>
+      <br>
+      Bubble Stockpile: {{ state.player.bubbles }}
+      <br>
+      <button
+        @click="placing = 'bubbles'"
+      >Place Bubbles</button>
+      <br>
+      <br>
+      Last Trade: {{ state.last_trade }}
+
+      <svg v-if="state.price_history.length > -1">
+        <polygon
+          :points="
+            '200,300 0,300 '
+              + state.price_history
+                  .map((p, i) => `${200 / state.price_history.length * i},${300 - p}` )
+                  .join(' ')
+          "
+        ></polygon>
+      </svg>
     </div>
   </div>
 </template>
