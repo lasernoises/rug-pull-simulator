@@ -1,6 +1,6 @@
 import { reactive } from "vue";
 import type { Vec2 } from "./vector-algebra";
-import { length, sub, rebound, minus } from './vector-algebra';
+import { length, sub, rebound, minus, scalarProduct } from './vector-algebra';
 
 export function dbg<T>(t: T): T {
   console.log(t);
@@ -151,8 +151,13 @@ export function tick(state: State) {
 
     for (const j in state.billboards) {
       const billboard = state.billboards[j];
-      if(length(sub(econ.pos, billboard)) < params.billboard_influence_radius) {
+      const distance = length(sub(econ.pos, billboard[0])) + length(sub(econ.pos, billboard[1]));
+      if(distance < params.billboard_influence_radius) {
         econ.bubble_value += params.billboard_influence_strength;
+      }
+      if (distance < params.econ_min_distance) {
+        const n = { x: billboard[1].y - billboard[0].y, y: -billboard[1].x + billboard[0].x };
+        econ.velocity = rebound(econ.velocity, n);
       }
     }
 
