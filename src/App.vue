@@ -264,6 +264,8 @@ const max_price = computed(() => {
         {{ name }}:
         <input type="number" v-model="params[name]"/>
       </template>
+      <br>Selling Price:<input type="number" v-model="state.player.selling_price">
+      <br>Buying Price:<input type="number" v-model="state.player.buying_price">
       <br>
       <br>
       <button @click="reset">Reset</button>

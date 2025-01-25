@@ -52,6 +52,7 @@ export const params = reactive({
   econ_velocity_change_chance: 0.01,
   econ_bubble_collection_radius: 32,
   econ_food_collection_radius: 64,
+  econ_food_consumption: 0.01,
   food_value: 12,
   bubbles_bulk_place_amount: 10,
   billboard_influence_radius: 128,
@@ -214,6 +215,8 @@ export function tick(state: State) {
     }
   }
 
+  state.econs.forEach(e => { e.food -= params.econ_food_consumption; })
+
   let alive_econs = [];
   state.econs.forEach(e => {
     if(e.food > 0) alive_econs.push(e);
@@ -304,7 +307,7 @@ function trade(state: State, a: Econ, b: Econ) {
     Math.ceil(buyer.bubble_value) - buyer.bubbles,
     Math.floor(buyer.food / price),
     seller.bubbles - Math.ceil(seller.bubble_value),
-c  );
+  );
   console.log(`Trading amount ${amount}`);
 
   if (amount === 0) {
