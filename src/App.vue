@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { onMounted, computed, ref, watch } from "vue";
-import { dbg, init, tick, econ, availableMarketingDevices, type Vec2 } from "./state.ts";
+import { dbg, init, tick, econ, availableMarketingDevices, params, type Vec2 } from "./state.ts";
 
-const state = init();
+const state = ref(init());
+
+let speed: number|undefined = undefined;
 
 const update = () => {
-  tick(state);
-  requestAnimationFrame(update);
+  tick(state.value);
+  if(speed === undefined){
+    requestAnimationFrame(update);
+  } else {
+    setTimeout(update, speed);
+  }
 };
 
 const svgElement = ref<SVGGraphicsElement | undefined>();
@@ -45,13 +51,16 @@ onMounted(() => {
 
 const placing = ref<"bubbles" | "billboard" | null>(null);
 
-const marketingDevices = computed(() => availableMarketingDevices(state.player));
+const marketingDevices = computed(() => ({
+  billboard: state.value.player.marketing_points >= params.billboard_price,
+  influencer: state.value.player.marketing_points >= 50,
+}));
 
 const avgValue = computed(
-  () => state.econs
+  () => state.value.econs
     .map(e => e.bubble_value)
     .reduce((a, b) => a + b, 0)
-    / state.econs.length,
+    / state.value.econs.length,
 );
 
 const place = () => {
@@ -59,13 +68,13 @@ const place = () => {
 
   switch (placing.value) {
     case "bubbles":
-      state.bubbles.push(pos);
-      state.player.bubbles -= 1;
+      state.value.bubbles.push(pos);
+      state.value.player.bubbles -= 1;
       return;
       // break;
     case "billboard":
-      state.billboards.push(pos);
-      state.player.marketing_points -= 20;
+      state.value.billboards.push(pos);
+      state.value.player.marketing_points -= 20;
       break;
   }
 
@@ -78,6 +87,9 @@ const place = () => {
 
 };
 
+const reset = () => {
+  state.value = init();
+};
 </script>
 
 <template>
@@ -98,6 +110,7 @@ const place = () => {
         <circle
           :cx="econ.pos.x"
           :cy="econ.pos.y"
+          :fill="`rgb(${econ.food}, ${econ.bubbles}, ${econ.bubble_value})`"
           r="16"
         ></circle>
       </template>
@@ -159,6 +172,8 @@ const place = () => {
 
     </svg>
     <div style="flex-grow: 1; width: 100%; height: 100%">
+      <button type="checkbox" @click="speed = 0">Max Speed</button>
+      <br>
       Marketing Points: {{ state.player.marketing_points }}
       <br>
       <button @click="state.player.marketing_points += 20">Brainstorm</button>
@@ -178,7 +193,7 @@ const place = () => {
       Bubble Stockpile: {{ state.player.bubbles }}
       <br>
       <button
-        @click="placing = 'bubbles'"
+        @click="placing === 'bubbles' ? placing = null : placing = 'bubbles'"
       >Place Bubbles</button>
       <br>
       <br>
@@ -194,6 +209,16 @@ const place = () => {
           "
         ></polygon>
       </svg>
+      <br>
+      <br>
+      <template v-for="param, name in params">
+        <br>
+        {{ name }}:
+        <input type="number" v-model="params[name]"/>
+      </template>
+      <br>
+      <br>
+      <button @click="reset">Reset</button>
     </div>
   </div>
 </template>

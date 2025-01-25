@@ -24,7 +24,7 @@ export function econ(pos: Vec2, velocity: Vec2): Econ {
   return {
     pos,
     velocity,
-    food: 0,
+    food: params.econ_initial_food,
     bubbles: 0,
     bubble_value: 0,
   };
@@ -35,20 +35,36 @@ export type Player = {
   marketing_points: number,
 };
 
+export const params = reactive({
+  food_spawn_chance: 0.01,
+  player_initial_bubbles: 256,
+  econ_initial_food: 20,
+  econ_min_distance: 32,
+  econ_velocity_change_chance: 0.01,
+  econ_bubble_collection_radius: 32,
+  econ_food_collection_radius: 64,
+  food_value: 12,
+  billboard_influence_radius: 128,
+  billboard_influence_strength: 0.1,
+  billboard_price: 20,
+  influencer_price: 50,
+  marketinng_point_increment: 20,
+});
+
 export type State = {
   player: Player,
   econs: Econ[],
   billboards: Vec2[],
   food: Vec2[],
   bubbles: Vec2[],
-  last_trade: { ammount: number, price: number } | null,
+  last_trade: { amount: number, price: number } | null,
   price_history: number[],
 };
 
 export function init(): State {
   return reactive({
     player: {
-      bubbles: 2048,
+      bubbles: params.player_initial_bubbles,
       marketing_points: 0,
     },
     billboards: [],
@@ -57,9 +73,9 @@ export function init(): State {
     last_trade: null,
     price_history: [],
     econs: 
-      [...Array(32).keys()].map(() => econ(
+      n_random_pos_no_collisions(32, params.econ_min_distance).map(pos => econ(
       // [...Array(Math.round(Math.random() * 32)).keys()].map(() => econ(
-        random_pos(),
+        pos,
         {
           x: Math.random() * 2 - 1,
           y: Math.random() * 2 - 1,
@@ -69,14 +85,26 @@ export function init(): State {
 }
 
 function random_pos(): Vec2 {
-  while (true) {
+  while(true) {
     const pos =  {
       x: Math.random() * 1024 - 512,
       y: Math.random() * 1024 - 512,
     };
-
-    if (length(pos) < 512) return pos;
+    if (length(pos) < 512){
+      return pos;
+    }
   }
+}
+
+function n_random_pos_no_collisions(n: number, entity_min_distance: number): Vec2[] {
+  let result: Vec2[] = [];
+  while (result.length < n) {
+    const pos = random_pos();
+    if(result.every(oldPos => length(sub(oldPos, pos)) > entity_min_distance)) {
+      result.push(pos);
+    }
+  }
+  return result;
 }
 
 function sub(a: Vec2, b: Vec2): Vec2 {
@@ -92,6 +120,10 @@ function length(vec: Vec2): number {
   return Math.abs(Math.sqrt(x * x + y * y));
 } 
 
+function scalarProduct(v1: Vec2, v2: Vec2): number {
+  return v1.x * v2.x + v1.y * v2.y;
+}
+
 export function tick(state: State) {
   for (const i in state.econs) {
     const econ = state.econs[i];
@@ -103,9 +135,17 @@ export function tick(state: State) {
     }
 
     for (const j in state.econs) {
+      const other = state.econs[j];
+
       if (i === j) continue;
 
-      const other = state.econs[j];
+      if(scalarProduct(econ.velocity, sub(econ.pos, other.pos)) < 0) {
+        // nothing to do, econ was already moving away
+      } else {
+        const tmp = econ.velocity;
+        econ.velocity = other.velocity;
+        other.velocity = tmp;
+      }
 
       // if (length(sub(econ.pos, other.pos)) < 64) {
       //   econ.velocity = {x: 0, y: 0};
@@ -113,7 +153,7 @@ export function tick(state: State) {
 
       if (i >= j) continue; // below is only once per pair
 
-      if (length(sub(econ.pos, other.pos)) < 32) {
+      if (length(sub(econ.pos, other.pos)) < params.econ_min_distance) {
         const tmp = econ.velocity;
         econ.velocity = other.velocity;
         other.velocity = tmp;
@@ -124,20 +164,14 @@ export function tick(state: State) {
 
     for (const j in state.billboards) {
       const billboard = state.billboards[j];
-
-      if (length(sub(econ.pos, billboard)) < 128) {
-        // econ.velocity.x = -econ.velocity.x;
-        // econ.velocity.y = -econ.velocity.y;
-
-        econ.bubble_value += 0.1;
-      }
+      econ.bubble_value += params.billboard_influence_strength;
     }
 
     for (const j in state.food) {
       const food = state.food[j];
 
-      if (length(sub(econ.pos, food)) < 64) {
-        econ.food += 12;
+      if (length(sub(econ.pos, food)) < params.econ_food_collection_radius) {
+        econ.food += params.food_value;
 
         state.food.splice(Number(j), 1);
 
@@ -148,7 +182,7 @@ export function tick(state: State) {
     for (const j in state.bubbles) {
       const bubble = state.bubbles[j];
 
-      if (length(sub(econ.pos, bubble)) < 32) {
+      if (length(sub(econ.pos, bubble)) < params.econ_bubble_collection_radius) {
         econ.bubbles += 1;
 
         state.bubbles.splice(Number(j), 1);
@@ -160,7 +194,7 @@ export function tick(state: State) {
     econ.pos.x += econ.velocity.x;
     econ.pos.y += econ.velocity.y;
 
-    if (Math.random() < 0.01) {
+    if (Math.random() < params.econ_velocity_change_chance) {
       econ.velocity = {
         x: Math.random() * 2 - 1,
         y: Math.random() * 2 - 1,
@@ -168,7 +202,7 @@ export function tick(state: State) {
     }
   }
 
-  if (Math.random() < 0.005) {
+  if (Math.random() < params.food_spawn_chance) {
     state.food.push(random_pos());
   }
 }
@@ -176,13 +210,14 @@ export function tick(state: State) {
 function trade(state: State, a: Econ, b: Econ) {
   // when does a trade happen?
   // i guess when one has too many and one has too little
-  // the idea for now is to also use the value as the ammount the econ wants.
+  // the idea for now is to also use the value as the amount the econ wants.
   // at that point an exchange rate needs to be determined.
   // sale only happens if the seller has a lower value than the buyer.
   // at that point we use the price of the seller.
 
   let seller;
-  let buyer;
+
+  console.log(`${a} trades with ${b}`);  let buyer;
 
   if (a.bubbles > a.bubble_value && b.bubbles < b.bubble_value) {
     seller = a;
@@ -200,31 +235,25 @@ function trade(state: State, a: Econ, b: Econ) {
 
   if (price > buyer.bubble_value) return;
 
-  const ammount = Math.min(
+  const amount = Math.min(
     Math.ceil(buyer.bubble_value) - buyer.bubbles,
     Math.floor(buyer.food / price),
   );
+  console.log(`Trading amount ${amount}`);
 
-  if (ammount === 0) {
+  if (amount === 0) {
     return;
   }
 
-  seller.bubbles -= ammount;
-  buyer.bubbles += ammount;
+  seller.bubbles -= amount;
+  buyer.bubbles += amount;
 
-  buyer.food -= ammount * price;
-  seller.food += ammount * price;
+  buyer.food -= amount * price;
+  seller.food += amount * price;
 
   state.last_trade = {
-    ammount,
+    amount,
     price,
   };
   state.price_history.push(price);
-}
-
-export function availableMarketingDevices(player: Player) {
-  return {
-    billboard: player.marketing_points >= 20,
-    influencer: player.marketing_points >= 50,
-  };
 }
