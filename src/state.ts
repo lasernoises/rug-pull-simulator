@@ -139,13 +139,9 @@ export function tick(state: State) {
 
       if (i === j) continue;
 
-      if(scalarProduct(econ.velocity, sub(econ.pos, other.pos)) < 0) {
-        // nothing to do, econ was already moving away
-      } else {
-        const tmp = econ.velocity;
-        econ.velocity = other.velocity;
-        other.velocity = tmp;
-      }
+      const tmp = econ.velocity;
+      econ.velocity = other.velocity;
+      other.velocity = tmp;
 
       // if (length(sub(econ.pos, other.pos)) < 64) {
       //   econ.velocity = {x: 0, y: 0};
