@@ -123,6 +123,15 @@ const max_price = computed(() => {
       ></circle>
 
       <template
+        v-for="econ in state.dead_econs"
+      >
+        <Grave
+          :cx="econ.pos.x"
+          :cy="econ.pos.y"
+        ></Grave>
+      </template>
+
+      <template
         v-for="econ in state.econs"
       >
         <circle
@@ -143,15 +152,6 @@ const max_price = computed(() => {
           fill="white"
           style="font-size: 12px"
         >{{ econ.food }}</text>
-      </template>
-
-      <template
-        v-for="econ in state.dead_econs"
-      >
-        <Grave
-          :cx="econ.pos.x"
-          :cy="econ.pos.y"
-        ></Grave>
       </template>
 
       <template
