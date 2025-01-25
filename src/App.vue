@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, computed, ref, watch } from "vue";
 import { dbg, init, tick, econ, random_pos, params, type Vec2 } from "./state.ts";
+import { scale, normalize, sub, add } from "./vector-algebra.ts";
 import Grave from './Grave.vue';
 
 const state = ref(init());
@@ -50,7 +51,20 @@ onMounted(() => {
   update();
 });
 
-const placing = ref<"bubbles" | "billboard" | null>(null);
+const placing = ref<"bubbles" | "billboardFirstLeg" | "billboardSecondLeg" | null>(null);
+const previousLeg = ref<Vec2|null>(null);
+const nextLeg = computed(() => {
+  const pretty = a => `${a.x} ${a.y}`;
+  let result = add(previousLeg.value, scale(normalize(sub(mousePos.value, previousLeg.value)), params.billboard_length));
+  console.warn(`Previous: ${pretty(previousLeg.value)};
+    Next: ${pretty(mousePos.value)};
+    minus: ${pretty(sub(mousePos.value, previousLeg.value))};
+    normalize: ${pretty(normalize(sub(mousePos.value, previousLeg.value)))};
+    scale: ${pretty(scale(normalize(sub(mousePos.value, previousLeg.value)), params.billboard_length))};
+    add: ${pretty(add(previousLeg.value, scale(normalize(sub(mousePos.value, previousLeg.value)), params.billboard_length)))};
+    Computing nextLeg as ${pretty(result)}`);
+  return result;
+});
 
 const marketingDevices = computed(() => ({
   billboard: state.value.player.marketing_points >= params.billboard_price,
@@ -74,32 +88,28 @@ const bulk_place_bubbles = () => {
   }
 };
 
-const place = () => {
+const onSvgClick = () => {
   const pos = mousePos.value!;
 
   switch (placing.value) {
     case "bubbles":
-      if (state.value.player.bubbles === 0) {
+      if (state.value.player.bubbles <= 0) {
         return;
       }
       state.value.bubbles.push(pos);
       state.value.player.bubbles -= 1;
       return;
       // break;
-    case "billboard":
-      state.value.billboards.push(pos);
-      state.value.player.marketing_points -= 20;
+    case "billboardFirstLeg":
+      previousLeg.value = pos;
+      placing.value = "billboardSecondLeg";
       break;
-  }
-
-  placing.value = null;
-
-  // state.econs.push(econ(
-  //   pos,
-  //   {x: 1, y: 1, },
-  // ));
-
-};
+    case "billboardSecondLeg":
+      state.value.billboards.push([previousLeg.value, nextLeg.value]);
+      state.value.player.marketing_points -= 20;
+      placing.value = null;
+  };
+}
 
 const reset = () => {
   state.value = init();
@@ -116,6 +126,7 @@ const max_price = computed(() => {
       style="flex-grow: 2; width: 100%; height: 100%; pointer-events: visible;"
       viewBox="-512 -512 1024 1024"
       ref="svgElement"
+      @click="onSvgClick"
     >
       <circle
         r="512"
@@ -157,12 +168,14 @@ const max_price = computed(() => {
       <template
         v-for="pos in state.billboards"
       >
-        <circle
-          :cx="pos.x"
-          :cy="pos.y"
-          r="16"
-          fill="red"
-        ></circle>
+        <line
+          :x1="pos[0].x"
+          :y1="pos[0].y"
+          :x2="pos[1].x"
+          :y2="pos[1].y"
+          stroke-width="4"
+          stroke="red"
+        ></line>
       </template>
 
       <template
@@ -191,7 +204,7 @@ const max_price = computed(() => {
 
       <template v-if="mousePos !== null">
         <circle
-          v-if="placing === 'billboard'"
+          v-if="placing === 'billboardFirstLeg'"
           :cx="mousePos.x"
           :cy="mousePos.y"
           r="16"
@@ -207,6 +220,16 @@ const max_price = computed(() => {
           @click="place"
           fill="green"
         ></circle>
+
+        <line
+          v-else-if="placing === 'billboardSecondLeg'"
+          :x1="previousLeg.x"
+          :y1="previousLeg.y"
+          :x2="nextLeg.x"
+          :y2="nextLeg.y"
+          stroke-width="8"
+          stroke="red"
+        ></line>
       </template>
 
     </svg>
@@ -220,7 +243,7 @@ const max_price = computed(() => {
       <br>
       <button
         v-if="marketingDevices.billboard"
-        @click="placing = 'billboard'"
+        @click="placing = 'billboardFirstLeg'"
       >
         Deploy Billboard
       </button>

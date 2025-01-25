@@ -10,8 +10,20 @@ export function sub(a: Vec2, b: Vec2): Vec2 {
   };
 }
 
+export function add(a: Vec2, b: Vec2): Vec2 {
+  return { x: a.x + b.x, y: a.y + b.y };
+}
+
 export function minus(a: Vec2): Vec2 {
   return {x: -a.x, y:-a.y};
+}
+
+export function scale(a: Vec2, l: number): Vec2 {
+  return {x: l * a.x, y: l * a.y};
+}
+
+export function normalize(a: Vec2): Vec2 {
+  return scale(a, 1/length(a));
 }
 
 export function length(vec: Vec2): number {
@@ -52,7 +64,3 @@ export function rebound(v: Vec2, n: Vec2): Vec2 {
   }
   return { x: result[0], y: result[1] };
 }
-
-const v = { x: -1, y: 0 };
-const n = { x: 1, y: 1 };
-console.log(rebound(v, n));
