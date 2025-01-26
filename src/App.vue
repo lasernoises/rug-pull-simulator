@@ -8,18 +8,40 @@ const state = ref(init());
 
 let speed: number|undefined = undefined;
 let isPaused: boolean = false;
+let activateMaxSpeed: boolean = false;
 
 const update = () => {
 
   if (!isPaused) {
-    tick(state.value);
-  }
 
+  tick(state.value);
+  if (activateMaxSpeed) {
+    for (let i = 0; i < 10; i++) {
+      tick(state.value);
+    }
+  }
+  requestAnimationFrame(update);
+}
+  /*
   if(speed === undefined){
     requestAnimationFrame(update);
   } else {
     setTimeout(update, speed);
-  }
+  }*/
+};
+
+const togglePause = () => {
+  isPaused = !isPaused;
+  // Need one more tick to update button text
+  tick(state.value);
+  requestAnimationFrame(update);
+};
+
+const toggleMaxSpeed = () => {
+  activateMaxSpeed = !activateMaxSpeed;
+  // Need one more tick to update button text
+  tick(state.value);
+  requestAnimationFrame(update);
 };
 
 const svgElement = ref<SVGGraphicsElement | undefined>();
@@ -119,6 +141,7 @@ const onSvgClick = () => {
 const reset = () => {
   state.value = init();
   isPaused = false;
+  activateMaxSpeed = false;
 };
 
 const max_price = computed(() => {
@@ -241,8 +264,9 @@ const max_price = computed(() => {
     </svg>
     <div style="flex-grow: 1; width: 100%; height: 100%">
       <div style="display: flex; gap: 10px; margin-left: auto;">
-        <button type="button" @click="speed = 0; isPaused=false">Max speed</button>
-        <button type="button" @click="isPaused = !isPaused">Pause</button>
+        <!---<button type="button" @click="speed = 0; isPaused=false">Default speed</button>--->
+        <button type="button" @click=togglePause>{{ isPaused ? 'Unpause' : 'Pause' }}</button>
+        <button type="button" @click=toggleMaxSpeed>{{ activateMaxSpeed ? 'Normal Speed' : 'Max Speed' }}</button>
         <button @click="reset">Reset</button>
       </div>
 
