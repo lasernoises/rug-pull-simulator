@@ -165,12 +165,47 @@ const max_price = computed(() => {
       ></circle>
 
       <template
+        v-for="pos in state.food"
+      >
+        <circle
+          :cx="pos.x"
+          :cy="pos.y"
+          r="16"
+          fill="yellow"
+        ></circle>
+      </template>
+
+      <template
+        v-for="pos in state.bubbles"
+      >
+        <circle
+          :cx="pos.x"
+          :cy="pos.y"
+          r="16"
+          fill="green"
+        ></circle>
+      </template>
+
+      <template
         v-for="econ in state.dead_econs"
       >
         <Grave
           :cx="econ.pos.x"
           :cy="econ.pos.y"
         ></Grave>
+      </template>
+
+      <template
+        v-for="pos in state.billboards"
+      >
+        <line
+          :x1="pos[0].x"
+          :y1="pos[0].y"
+          :x2="pos[1].x"
+          :y2="pos[1].y"
+          stroke-width="4"
+          stroke="red"
+        ></line>
       </template>
 
       <template
@@ -194,41 +229,6 @@ const max_price = computed(() => {
           fill="white"
           style="font-size: 12px"
         >{{ Math.round(econ.food) }}</text>
-      </template>
-
-      <template
-        v-for="pos in state.billboards"
-      >
-        <line
-          :x1="pos[0].x"
-          :y1="pos[0].y"
-          :x2="pos[1].x"
-          :y2="pos[1].y"
-          stroke-width="4"
-          stroke="red"
-        ></line>
-      </template>
-
-      <template
-        v-for="pos in state.food"
-      >
-        <circle
-          :cx="pos.x"
-          :cy="pos.y"
-          r="16"
-          fill="yellow"
-        ></circle>
-      </template>
-
-      <template
-        v-for="pos in state.bubbles"
-      >
-        <circle
-          :cx="pos.x"
-          :cy="pos.y"
-          r="16"
-          fill="green"
-        ></circle>
       </template>
 
       <circle cx="0" cy="0" r="32" fill="blue"/>
