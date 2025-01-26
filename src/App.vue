@@ -3,6 +3,7 @@ import { onMounted, computed, ref, watch, shallowRef, triggerRef } from "vue";
 import { dbg, init, tick, econ, random_pos, params } from "./state.ts";
 import { scale, normalize, sub, add, type Vec2 } from "./vector-algebra.ts";
 import Grave from './Grave.vue';
+import Econ from "./Econ.vue";
 import { doTutorial } from './tutorial';
 
 const state = shallowRef(init());
@@ -260,24 +261,13 @@ const max_price = computed(() => {
       <template
         v-for="econ in state.econs"
       >
-        <circle
-          :cx="econ.pos.x"
-          :cy="econ.pos.y"
-          :fill="`rgb(${econ.food}, ${econ.bubbles}, ${econ.bubble_value})`"
-          r="16"
-        ></circle>
-        <text
-          :x="econ.pos.x - 10"
-          :y="econ.pos.y"
-          fill="lightgreen"
-          style="font-size: 12px"
-        >{{ econ.bubbles }}/{{ Math.round(econ.bubble_value) }}</text>
-        <text
-          :x="econ.pos.x - 8"
-          :y="econ.pos.y + 12"
-          fill="white"
-          style="font-size: 12px"
-        >{{ Math.round(econ.food) }}</text>
+          <Econ
+            :x="econ.pos.x"
+            :y="econ.pos.y"
+            :food="econ.food"
+            :bubbles="econ.bubbles"
+            :bubble_value="econ.bubble_value"
+          ></Econ>
       </template>
 
       <template
