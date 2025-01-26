@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { Econ, State } from './state';
 
 const props = defineProps<{
     x: number,
@@ -8,6 +7,7 @@ const props = defineProps<{
     food: number,
     bubbles: number,
     bubble_value: number,
+    activateDebugBuild: boolean,
 }>();
 
 const foodAngle = computed(() => Math.min(1, Math.sqrt(props.food) / 20) * 2 * Math.PI);
@@ -32,6 +32,7 @@ const foodAngle = computed(() => Math.min(1, Math.sqrt(props.food) / 20) * 2 * M
             fill="#a30914"
         ></path>
         <text
+            v-if="activateDebugBuild"
             x="-10"
             y="0"
             fill="white"

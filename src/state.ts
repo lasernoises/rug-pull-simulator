@@ -101,7 +101,10 @@ export function init(): State {
     billboards: [],
     food: [],
     bubbles: [],
-    influencers: [],
+    influencers: [
+      // {pos: {x: -50, y: 0}, velocity: {x: 1, y: 0}},
+      // {pos: {x: 50, y: 0}, velocity: {x: -0, y: 0}},
+    ],
     last_trade: null,
     price_history: [],
     player_food_history: [],
@@ -273,6 +276,37 @@ export function tick(state: State): boolean {
 
     if (length(influencer.pos) > 512) {
       influencer.velocity = rebound(influencer.velocity, minus(influencer.pos));
+    }
+
+    for (const j in state.influencers) {
+      const other = state.influencers[j];
+
+      if (length(sub(influencer.pos, other.pos)) < params.econ_min_distance) {
+        const tmp = influencer.velocity;
+        influencer.velocity = other.velocity;
+        other.velocity = tmp;
+      }
+    }
+
+    for (const j in state.billboards) {
+      const billboard = state.billboards[j];
+      // Coordinate along an axis parallel to the billboard; the first leg is at 0, the second at 1
+      const p_coordinate = scalarProduct(sub(influencer.pos, billboard[0]), sub(billboard[1], billboard[0])) / Math.pow(dist(billboard[1], billboard[0]), 2);
+      // An axis normal to the billboard
+      const n = normalize({ x: billboard[1].y - billboard[0].y, y: -billboard[1].x + billboard[0].x });
+      const distance = Math.min( // Assembling a shape around the billboard out of the union of
+        (p_coordinate >= 0 && p_coordinate <= 1) ? Math.abs(scalarProduct(n, sub(influencer.pos, billboard[0]))) : Infinity, // a rectangle of width k around the billboard line
+        dist(influencer.pos, billboard[0]), // A circle of radius k around the first and second legs
+        dist(influencer.pos, billboard[1])
+      );
+
+      if (distance < params.econ_min_distance) {
+        if(scalarProduct(n, sub(influencer.pos, billboard[0])) > 0) {
+          influencer.velocity = rebound(influencer.velocity, n);
+        } else {
+          influencer.velocity = rebound(influencer.velocity, minus(n));
+        }
+      }
     }
   }
 
