@@ -229,7 +229,7 @@ const max_price = computed(() => {
           :cx="pos.x"
           :cy="pos.y"
           r="16"
-          fill="#90a0ff"
+          fill="#90a0ff70"
           stroke="blue"
           stroke-width="2"
         ></circle>
@@ -314,7 +314,9 @@ const max_price = computed(() => {
           :cy="mousePos.y"
           r="16"
           @click="place"
-          fill="green"
+          fill="#90a0ff70"
+          stroke="blue"
+          stroke-width="2"
         ></circle>
 
         <line
