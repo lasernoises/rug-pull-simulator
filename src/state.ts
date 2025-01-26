@@ -1,4 +1,4 @@
-import { reactive } from "vue";
+import { reactive, computed } from "vue";
 import type { Vec2 } from "./vector-algebra";
 import { length, sub, rebound, minus, scalarProduct } from './vector-algebra';
 
@@ -69,6 +69,7 @@ export type State = {
   bubbles: Vec2[],
   last_trade: { amount: number, price: number } | null,
   price_history: number[],
+  avgValue: number,
 };
 
 export function init(): State {
@@ -94,6 +95,7 @@ export function init(): State {
         },
       )),
     dead_econs: [],
+    avgValue: 0,
   });
 }
 
@@ -178,7 +180,7 @@ export function tick(state: State) {
 
       if (length(sub(econ.pos, bubble)) < params.econ_bubble_collection_radius) {
         econ.bubbles += 1;
-
+        state.player.food += state.avgValue;
         state.bubbles.splice(Number(j), 1);
 
         break;
@@ -212,6 +214,13 @@ export function tick(state: State) {
   if (Math.random() < params.food_spawn_chance) {
     state.food.push(random_pos());
   }
+
+  state.avgValue = computed(
+    () => state.econs
+      .map(e => e.bubble_value)
+      .reduce((a, b) => a + b, 0)
+      / state.econs.length,
+  ).value;
 }
 
 function trade_with_player(state: State, a: Econ) {

@@ -98,13 +98,6 @@ const marketingDevices = computed(() => ({
   influencer: state.value.player.marketing_points >= 50,
 }));
 
-const avgValue = computed(
-  () => state.value.econs
-    .map(e => e.bubble_value)
-    .reduce((a, b) => a + b, 0)
-    / state.value.econs.length,
-);
-
 const bulk_place_bubbles = () => {
   for (let i = 0; i < params.bubbles_bulk_place_amount; i++) {
     if (state.value.player.bubbles === 0) {
@@ -283,10 +276,10 @@ const max_price = computed(() => {
       </button>
       <br>
       <br>
-      Avg. Value: {{ Math.round(avgValue * 100) / 100 }}
+      Avg. Value: {{ Math.round(state.avgValue * 100) / 100 }}
       <br>
       Bubble Stockpile: {{ state.player.bubbles }} <br/>
-      Food: {{ state.player.food }}
+      Food: {{ Math.round(state.player.food * 100) / 100 }}
       <br>
       <br>
       <div style="display: flex; gap: 10px; margin-left: auto;">
