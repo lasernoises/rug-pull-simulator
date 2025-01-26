@@ -332,21 +332,19 @@ const max_player_food = computed(() => {
         <!---<button type="button" @click="speed = 0; isPaused=false">Default speed</button>--->
         <button type="button" @click=togglePause>{{ isPaused ? 'Unpause' : 'Pause' }}</button>
         <button type="button" @click=toggleMaxSpeed>{{ activateMaxSpeed ? 'Normal Speed' : 'Max Speed' }}</button>
-        <button type="button" @click="reset">Reset</button>
+        <button v-if="activateDebugBuild" type="button" @click="reset">Reset</button>
         <button type="button" @click="cashOut = true">Cash Out</button>
         <button type="button" @click="toggleDebug">{{ activateDebugBuild ? 'Deactivate Debug' : 'Active Debug' }}</button>
+        <button v-if="tutorialDone" @click="ev => { tutorialDone = false; ev.stopPropagation(); }">Redo tutorial</button>
       </div>
-      <button v-if="tutorialDone" @click="ev => { tutorialDone = false; ev.stopPropagation(); }">Redo tutorial</button>
-
-      <br>
       <br>
 
       <!----------------- MARKETING ----------------->
 
       <hr>
-      <h3>Marketing</h3>
+      <h2>Marketing</h2>
       <div>Marketing Points: {{ state.player.marketing_points }}</div>
-      <div>Marketing Cost: {{ state.playerFoodCostPerSecond }} food / second</div>
+      <div>Marketing Cost: -{{ state.playerFoodCostPerSecond }} Food / second</div>
       <br>
       <button
         @click="state.player.marketing_points += params.marketing_point_increment"
@@ -373,30 +371,30 @@ const max_player_food = computed(() => {
       >
         Hire Marketing Person
       </button>
-      <span style="margin-left: 6px;">(-{{ params.marketing_person_salary }} food / second)</span>
+      <span style="margin-left: 6px;">(+1 Marketing Points / second, -{{ params.marketing_person_salary }} Food / second)</span>
       <br>
 
       <button
         :disabled="state.player.food <= params.influencer_salary"
         @click="place_influencer"
       >
-        Hire Influencer ({{ params.influencer_salary }} food / second)
+        Hire Influencer ({{ params.influencer_salary }} Food / second)
       </button>
-      <span style="margin-left: 6px;">(-{{ params.influencer_salary }} food / second)</span>
+      <span style="margin-left: 6px;">(-{{ params.influencer_salary }} Food / second)</span>
       <br>
 
       <!----------------- ECONOMY ----------------->
       <br>
       <hr>
-      <h3>Player Economy</h3>
+      <h2>Player Economy</h2>
       <div style="display: flex; gap: 10px; margin-left: auto; margin-top: 0.5em;">
         <button 
           @click="placing === 'bubbles' ? placing = null : placing = 'bubbles'"
         >Place Bubbles</button>
         <button @click="bulk_place_bubbles">Mass Place Bubbles</button>
         <button @click="rug_pull">Pull Rug</button>
-        Bubble Stockpile: {{ state.player.bubbles }}
       </div>
+      <div style="margin-top: 0.5em">Bubble Stockpile: {{ state.player.bubbles }}</div>
       <div style="margin-top: 0.5em;"><span id="foodScore">Player Food: {{ Math.round(state.player.food * 100) / 100 }} (Highscore: {{ Math.round(state.highscore * 100) / 100 }})</span></div>
       <svg
         v-if="state.player_food_history.length > -1"
@@ -419,7 +417,7 @@ const max_player_food = computed(() => {
 
       <br>
       <hr>
-      <h3>Price History</h3>
+      <h2>Price History</h2>
       Current Bubble Price: {{ Math.round(state.avgValue * 100) / 100 }}
       <span v-if="activateDebugBuild" style="margin-left: 6px;">
         (Deprecation factor: {{ Math.round(state.deprecationFactor * 100) / 100 }})
