@@ -12,15 +12,14 @@ let activateMaxSpeed = ref(false);
 
 const update = () => {
   if (!isPaused.value) {
-
-  tick(state.value);
-  if (activateMaxSpeed.value) {
-    for (let i = 0; i < 10; i++) {
-      tick(state.value);
+    tick(state.value);
+    if (activateMaxSpeed.value) {
+      for (let i = 0; i < 10; i++) {
+        tick(state.value);
+      }
     }
   }
   requestAnimationFrame(update);
-}
   /*
   if(speed === undefined){
     requestAnimationFrame(update);
