@@ -334,7 +334,7 @@ const max_player_food = computed(() => {
         <button type="button" @click=toggleMaxSpeed>{{ activateMaxSpeed ? 'Normal Speed' : 'Max Speed' }}</button>
         <button v-if="activateDebugBuild" type="button" @click="reset">Reset</button>
         <button type="button" @click="cashOut = true">Cash Out</button>
-        <button type="button" @click="toggleDebug">{{ activateDebugBuild ? 'Deactivate Debug' : 'Active Debug' }}</button>
+        <!-- <button type="button" @click="toggleDebug">{{ activateDebugBuild ? 'Deactivate Debug' : 'Active Debug' }}</button> -->
         <button v-if="tutorialDone" @click="ev => { tutorialDone = false; ev.stopPropagation(); }">Redo tutorial</button>
       </div>
       <br>
