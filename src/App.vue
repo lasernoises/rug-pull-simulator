@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { onMounted, computed, ref, watch } from "vue";
+import { onMounted, computed, ref, watch, shallowRef, triggerRef } from "vue";
 import { dbg, init, tick, econ, random_pos, params } from "./state.ts";
 import { scale, normalize, sub, add, type Vec2 } from "./vector-algebra.ts";
 import Grave from './Grave.vue';
 
-const state = ref(init());
+const state = shallowRef(init());
 
 //let speed: number|undefined = undefined;
 let isPaused = ref(false);
@@ -19,6 +20,7 @@ const update = () => {
       }
     }
   }
+  triggerRef(state);
   requestAnimationFrame(update);
   /*
   if(speed === undefined){

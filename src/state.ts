@@ -78,7 +78,7 @@ export type State = {
 };
 
 export function init(): State {
-  return reactive({
+  return {
     player: {
       bubbles: params.player_initial_bubbles,
       marketing_points: 0,
@@ -103,7 +103,7 @@ export function init(): State {
     avgValue: 0,
     deprecationFactor: 1,
     highscore: 0,
-  });
+  };
 }
 
 export function random_pos(): Vec2 {
