@@ -19,7 +19,7 @@ const foodAngle = computed(() => Math.min(1, Math.sqrt(props.food) / 20) * 2 * M
     >
         <circle
             cx="0" cy="0"
-            :fill="`rgb(${bubbles}, 0, ${bubble_value})`"
+            :fill="`rgb(${bubbles}, 0, ${bubble_value * 10})`"
             r="16"
             ></circle>
         <path

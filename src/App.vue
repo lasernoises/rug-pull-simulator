@@ -296,6 +296,16 @@ const max_player_food = computed(() => {
         >I</text>
       </template>
 
+      <template
+        v-for="popup in state.cash_popups"
+      >
+        <text
+          :x="popup.pos.x"
+          :y="popup.pos.y"
+          :fill-opacity="`${popup.remaining_time / 60}`">${{ Math.round(popup.value * 100) / 100 }}
+        </text>
+      </template>
+
       <template v-if="mousePos !== null">
         <circle
           v-if="placing === 'billboardFirstLeg'"

@@ -67,6 +67,12 @@ export const params = reactive({
   influencer_influence_strength: 0.02,
 });
 
+type CashPopup = {
+  remaining_time: number,
+  pos: Vec2,
+  value: number,
+}
+
 export type State = {
   ticks: number,
   player: Player,
@@ -76,6 +82,7 @@ export type State = {
   food: Vec2[],
   bubbles: Vec2[],
   influencers: { pos: Vec2, velocity: Vec2 }[],
+  cash_popups: CashPopup[],
   last_trade: { amount: number, price: number } | null,
   price_history: number[],
   player_food_history: number[],
@@ -105,6 +112,7 @@ export function init(): State {
       // {pos: {x: -50, y: 0}, velocity: {x: 1, y: 0}},
       // {pos: {x: 50, y: 0}, velocity: {x: -0, y: 0}},
     ],
+    cash_popups: [],
     last_trade: null,
     price_history: [],
     player_food_history: [],
@@ -239,6 +247,8 @@ export function tick(state: State): boolean {
           econ.food -= econ.bubble_value;
           state.player.food += econ.bubble_value;
           state.bubbles.splice(Number(j), 1);
+
+          state.cash_popups.push({ remaining_time: 60, value: econ.bubble_value * state.deprecationFactor, pos: bubble });
         }
 
         break;
@@ -309,6 +319,11 @@ export function tick(state: State): boolean {
       }
     }
   }
+
+  state.cash_popups.forEach((popup) => {
+    popup.remaining_time -= 1;
+  });
+  state.cash_popups = state.cash_popups.filter(popup => popup.remaining_time > 0);
 
   state.econs.forEach(e => { e.food -= params.econ_food_consumption; })
 
