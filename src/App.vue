@@ -373,7 +373,6 @@ const max_player_food = computed(() => {
       </button>
       <span style="margin-left: 6px;">(+1 Marketing Points / second, -{{ params.marketing_person_salary }} Food / second)</span>
       <br>
-
       <button
         :disabled="state.player.food <= params.influencer_salary"
         @click="place_influencer"
@@ -451,6 +450,39 @@ const max_player_food = computed(() => {
       </template>
       <br>
       <br>
+
+      <h3>Legend</h3>
+
+      Bubble:
+
+      <svg width="32"
+        height="32"
+        preserveAspectRatio="none"
+        viewBox="-20 -20 36 36">
+        <circle
+          :cx="0"
+          :cy="0"
+          r="14"
+          fill="#90a0ff70"
+          stroke="blue"
+          stroke-width="2"
+        ></circle>
+      </svg>
+
+      Food:
+
+      <svg width="32"
+        height="32"
+        preserveAspectRatio="none"
+        viewBox="-20 -20 36 36">
+        <circle
+          :cx="0"
+          :cy="0"
+          r="14"
+          fill="yellow"
+        ></circle>
+      </svg>
+
     </div>
   </div>
 </template>
