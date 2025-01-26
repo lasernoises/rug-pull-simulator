@@ -287,6 +287,13 @@ const max_price = computed(() => {
           fill="red"
           r="16"
         ></circle>
+
+        <text
+          :x="influencer.pos.x - 7"
+          :y="influencer.pos.y + 8"
+          fill="white"
+          style="font-size: 24px; font-family: monospace;"
+        >I</text>
       </template>
 
       <template v-if="mousePos !== null">
