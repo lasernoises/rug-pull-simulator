@@ -24,7 +24,7 @@ const update = () => {
     }
 
     if (!alive) {
-      window.alert("Game Over! You can't feed your marketing department anymore!");
+      window.alert("Game Over! You can't feed your marketing department / influencer hype-squad anymore!");
       reset();
     }
 
