@@ -11,7 +11,7 @@ const state = shallowRef(init());
 let isPaused = ref(false);
 let activateMaxSpeed = ref(false);
 let cashOut = ref(false);
-let activateDebugBuild = ref(true);
+let activateDebugBuild = ref(false);
 
 const tutorialDone = ref<boolean>(localStorage.getItem("tutorialDone") !== null);
 
@@ -323,6 +323,7 @@ const max_price = computed(() => {
 
     </svg>
     <div style="flex-grow: 1; width: 100%; height: 100%">
+      <br>
       <div style="display: flex; gap: 10px; margin-left: auto;">
         <!---<button type="button" @click="speed = 0; isPaused=false">Default speed</button>--->
         <button type="button" @click=togglePause>{{ isPaused ? 'Unpause' : 'Pause' }}</button>
@@ -334,6 +335,12 @@ const max_price = computed(() => {
       <button v-if="tutorialDone" @click="ev => { tutorialDone = false; ev.stopPropagation(); }">Redo tutorial</button>
 
       <br>
+      <br>
+
+      <!----------------- MARKETING ----------------->
+
+      <hr>
+      <h3>Marketing</h3>
       <div>Marketing Points: {{ state.player.marketing_points }}</div>
       <br>
       <button
@@ -369,10 +376,14 @@ const max_price = computed(() => {
         Hire Influencer ({{ params.influencer_salary }} food / second)
       </button>
       <br>
-      <div v-if="activateDebugBuild">Deprecation factor: {{ Math.round(state.deprecationFactor * 100) / 100 }}</div>
-      Bubble Stockpile: {{ state.player.bubbles }}
+
+      <!----------------- ECONOMY ----------------->
       <br>
-      <span id="foodScore">Food: {{ Math.round(state.player.food * 100) / 100 }} (Highscore: {{ Math.round(state.highscore * 100) / 100 }})</span>
+      <hr>
+      <h3>Player Economy</h3>
+      <span id="foodScore">Player Food: {{ Math.round(state.player.food * 100) / 100 }} (Highscore: {{ Math.round(state.highscore * 100) / 100 }})</span>
+      <br>
+      Bubble Stockpile: {{ state.player.bubbles }}
       <br>
       <div style="display: flex; gap: 10px; margin-left: auto;">
         <button 
@@ -382,14 +393,19 @@ const max_price = computed(() => {
         <button @click="bulk_place_bubbles">Mass Place Bubbles</button>
         <button @click="rug_pull">Pull Rug</button>
       </div>
+      <br>Selling Price:<input type="number" v-model="state.player.selling_price">
+      <br>Buying Price:<input type="number" v-model="state.player.buying_price">
+      <br>
+      <br>
+      <hr>
+      <h3>Price History</h3>
+      Current Bubble Price: {{ Math.round(state.avgValue * 100) / 100 }}
+      <span v-if="activateDebugBuild" style="margin-left: 6px;">
+        (Deprecation factor: {{ Math.round(state.deprecationFactor * 100) / 100 }})
+      </span>
       <br>
       <!-- <br> -->
       <!-- Last Trade: {{ state.last_trade }} -->
-      <br>
-      Bubble Price: {{ Math.round(state.avgValue * 100) / 100 }}
-      <br>
-      Price History
-      <br>
       <br>
       <svg
         v-if="state.price_history.length > -1"
@@ -413,8 +429,6 @@ const max_price = computed(() => {
         {{ name }}:
         <input type="number" v-model="params[name]"/>
       </template>
-      <br>Selling Price:<input type="number" v-model="state.player.selling_price">
-      <br>Buying Price:<input type="number" v-model="state.player.buying_price">
       <br>
       <br>
     </div>
