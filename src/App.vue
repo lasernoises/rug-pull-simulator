@@ -108,6 +108,13 @@ const bulk_place_bubbles = () => {
   }
 };
 
+const rug_pull = () => {
+  for (let i = 0; i < state.value.player.bubbles; i++) {
+    state.value.bubbles.push(random_pos());
+  }
+  state.value.player.bubbles = 0;
+};
+
 const onSvgClick = () => {
   const pos = mousePos.value!;
 
@@ -293,6 +300,7 @@ const max_price = computed(() => {
         >Place Bubbles</button>
         <br>
         <button @click="bulk_place_bubbles">Mass Place Bubbles</button>
+        <button @click="rug_pull">Rug Pull</button>
       </div>
       <br>
       <br>
