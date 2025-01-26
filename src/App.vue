@@ -168,7 +168,7 @@ const max_price = computed(() => {
           :y="econ.pos.y + 12"
           fill="white"
           style="font-size: 12px"
-        >{{ econ.food }}</text>
+        >{{ Math.round(econ.food) }}</text>
       </template>
 
       <template
@@ -251,7 +251,6 @@ const max_price = computed(() => {
       <br>
       <button @click="state.player.marketing_points += 20">Brainstorm</button>
       <br>
-      <br>
       <button
         v-if="marketingDevices.billboard"
         @click="placing = 'billboardFirstLeg'"
@@ -260,22 +259,26 @@ const max_price = computed(() => {
       </button>
       <br>
       <br>
-      Avg. Value: {{ avgValue }}
-      <br>
+      Avg. Value: {{ Math.round(avgValue * 100) / 100 }}
       <br>
       Bubble Stockpile: {{ state.player.bubbles }} <br/>
       Food: {{ state.player.food }}
       <br>
-      <button
-        @click="placing === 'bubbles' ? placing = null : placing = 'bubbles'"
-      >Place Bubbles</button>
       <br>
-      <button
-        @click="bulk_place_bubbles"
-      >Bulk Place Bubbles</button>
+      <div style="display: flex; gap: 10px; margin-left: auto;">
+        <button 
+          @click="placing === 'bubbles' ? placing = null : placing = 'bubbles'"
+        >Place Bubbles</button>
+        <br>
+        <button @click="bulk_place_bubbles">Bulk Place Bubbles</button>
+      </div>
+      <br>
       <br>
       Last Trade: {{ state.last_trade }}
-
+      <br>
+      Price History
+      <br>
+      <br>
       <svg
         v-if="state.price_history.length > -1"
         width="256"
@@ -291,7 +294,6 @@ const max_price = computed(() => {
           fill="white"
         ></polygon>
       </svg>
-      <br>
       <br>
       <template v-for="param, name in params">
         <br>

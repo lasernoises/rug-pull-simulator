@@ -41,8 +41,8 @@ export type Player = {
 };
 
 export const params = reactive({
-  food_spawn_chance: 0.02,
-  player_initial_bubbles: 256,
+  food_spawn_chance: 0.03,
+  player_initial_bubbles: 512,
   market_trade_radius: 40,
   econ_initial_food: 20,
   econ_min_distance: 32,
@@ -57,7 +57,7 @@ export const params = reactive({
   billboard_length: 50,
   billboard_price: 20,
   influencer_price: 50,
-  marketinng_point_increment: 20,
+  marketing_point_increment: 20,
 });
 
 export type State = {
@@ -202,7 +202,7 @@ export function tick(state: State) {
 
   state.econs.forEach(e => { e.food -= params.econ_food_consumption; })
 
-  let alive_econs = [];
+  let alive_econs: Econ[] = [];
   state.econs.forEach(e => {
     if(e.food > 0) alive_econs.push(e);
     else state.dead_econs.push(e);
