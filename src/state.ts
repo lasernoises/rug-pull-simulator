@@ -231,10 +231,10 @@ export function tick(state: State): boolean {
 
       if (length(sub(econ.pos, bubble)) < params.econ_bubble_collection_radius) {
 
-        if (econ.food > econ.bubble_value * state.deprecationFactor) {
+        if (econ.food > econ.bubble_value) {
           econ.bubbles += 1;
-          econ.food -= econ.bubble_value * state.deprecationFactor;
-          state.player.food += state.avgValue;
+          econ.food -= econ.bubble_value;
+          state.player.food += econ.bubble_value;
           state.bubbles.splice(Number(j), 1);
         }
 
@@ -302,7 +302,8 @@ export function tick(state: State): boolean {
     // }
   }
 
-  const total_bubbles_picked_up = state.econs.map(e => e.bubbles).reduce((sum, bubbles) => sum + bubbles, 0);
+  let total_bubbles_picked_up = state.econs.map(e => e.bubbles).reduce((sum, bubbles) => sum + bubbles, 0);
+  total_bubbles_picked_up += state.dead_econs.map(e => e.bubbles).reduce((sum, bubbles) => sum + bubbles, 0);
   state.deprecationFactor = 1 - (total_bubbles_picked_up / params.player_initial_bubbles);
 
   state.playerFoodCostPerSecond = state.player.marketing_people * params.marketing_person_salary + state.influencers.length * params.influencer_salary;
