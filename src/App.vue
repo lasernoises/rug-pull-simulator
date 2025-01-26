@@ -333,7 +333,7 @@ const max_price = computed(() => {
         <button type="button" @click="reset">Reset</button>
         <button type="button" @click="cashOut = true">Cash Out</button>
       </div>
-      <button v-if="tutorialDone" @click="tutorialDone = false">Redo tutorial</button>
+      <button v-if="tutorialDone" @click="ev => { tutorialDone = false; ev.stopPropagation(); }">Redo tutorial</button>
 
       <br>
       Marketing Points: {{ state.player.marketing_points }}
@@ -341,6 +341,7 @@ const max_price = computed(() => {
       <button
         @click="state.player.marketing_points += params.marketing_point_increment"
         :disabled="isPaused"
+        id="marketingFirstButton"
       >Brainstorm</button>
       <br>
       <button
@@ -376,8 +377,7 @@ const max_price = computed(() => {
       Deprecation factor: {{ Math.round(state.deprecationFactor * 100) / 100 }}
       <br>
       Bubble Stockpile: {{ state.player.bubbles }} <br/>
-      Food: {{ Math.round(state.player.food * 100) / 100 }} (Highscore: {{ Math.round(state.highscore * 100) / 100 }})
-      <br>
+      <span id="foodScore">Food: {{ Math.round(state.player.food * 100) / 100 }} (Highscore: {{ Math.round(state.highscore * 100) / 100 }})</span>
       <br>
       <div style="display: flex; gap: 10px; margin-left: auto;">
         <button 
@@ -424,4 +424,19 @@ const max_price = computed(() => {
 </template>
 
 <style scoped>
+  .tutorial-highlight {
+    animation-name: blink;
+    animation-duration: 2s;
+    animation-timing-function: ease-in;
+    animation-iteration-count: infinite;
+  }
+
+  @keyframes blink {
+    from {
+      border: 2pt solid yellow;
+    }
+    to {
+      border: 2pt solid transparent;
+    }
+  }
 </style>
