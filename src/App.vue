@@ -391,9 +391,6 @@ const max_price = computed(() => {
         <button @click="bulk_place_bubbles">Mass Place Bubbles</button>
         <button @click="rug_pull">Pull Rug</button>
       </div>
-      <br>Selling Price:<input type="number" v-model="state.player.selling_price">
-      <br>Buying Price:<input type="number" v-model="state.player.buying_price">
-      <br>
       <br>
       <hr>
       <h3>Price History</h3>
