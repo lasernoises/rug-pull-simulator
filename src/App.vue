@@ -58,10 +58,11 @@ const update = () => {
 
 const handleCashOut = () => {
   let cashOutval = Math.round(state.value.player.food * 100) / 100;
+  let prevHighScore = Math.round(state.value.highscore * 100) / 100;
   if (state.value.player.food > state.value.highscore) {
-    window.alert(`Cashed out! You collected ${cashOutval} food! This is a new highscore! (Previous highscore: ${state.value.highscore})`);
+    window.alert(`Cashed out! You collected ${cashOutval} food! This is a new highscore! (Previous highscore: ${prevHighScore})`);
   } else {
-    window.alert(`Cashed out! You collected ${cashOutval} food. Try again to beat your highscore of ${state.value.highscore}!`);
+    window.alert(`Cashed out! You collected ${cashOutval} food. Try again to beat your highscore of ${prevHighScore}!`);
   }
   reset();
 };
