@@ -9,6 +9,7 @@ const state = shallowRef(init());
 //let speed: number|undefined = undefined;
 let isPaused = ref(false);
 let activateMaxSpeed = ref(false);
+let cashOut = ref(false);
 
 const update = () => {
   if (!isPaused.value) {
@@ -23,8 +24,12 @@ const update = () => {
     }
 
     if (!alive) {
-      window.alert("Game Over! You can't feed your marketing departement anymore!");
+      window.alert("Game Over! You can't feed your marketing department anymore!");
       reset();
+    }
+
+    if (cashOut.value) {
+      handleCashOut();
     }
   }
   triggerRef(state);
@@ -35,6 +40,16 @@ const update = () => {
   } else {
     setTimeout(update, speed);
   }*/
+};
+
+const handleCashOut = () => {
+  let cashOutval = Math.round(state.value.player.food * 100) / 100;
+  if (state.value.player.food > state.value.highscore) {
+    window.alert(`Cashed out! You collected ${cashOutval} food! This is a new highscore! (Previous highscore: ${state.value.highscore})`);
+  } else {
+    window.alert(`Cashed out! You collected ${cashOutval} food. Try again to beat your highscore of ${state.value.highscore}!`);
+  }
+  reset();
 };
 
 const togglePause = () => {
@@ -129,7 +144,7 @@ const onSvgClick = () => {
       return;
       // break;
     case "billboardFirstLeg":
-      if (state.value.player.marketing_points <= 0) {
+      if (state.value.player.marketing_points < params.billboard_price) {
         return;
       }
       previousLeg.value = pos;
@@ -151,6 +166,7 @@ const reset = () => {
   state.value.highscore = highscore;
   isPaused.value = false;
   activateMaxSpeed.value = false;
+  cashOut.value = false;
 };
 
 
@@ -277,7 +293,8 @@ const max_price = computed(() => {
         <!---<button type="button" @click="speed = 0; isPaused=false">Default speed</button>--->
         <button type="button" @click=togglePause>{{ isPaused ? 'Unpause' : 'Pause' }}</button>
         <button type="button" @click=toggleMaxSpeed>{{ activateMaxSpeed ? 'Normal Speed' : 'Max Speed' }}</button>
-        <button @click="reset">Reset</button>
+        <button type="button" @click="reset">Reset</button>
+        <button type="button" @click="cashOut = true">Cash Out</button>
       </div>
 
       <br>
@@ -322,7 +339,7 @@ const max_price = computed(() => {
         >Place Bubbles</button>
         <br>
         <button @click="bulk_place_bubbles">Mass Place Bubbles</button>
-        <button @click="rug_pull">Rug Pull</button>
+        <button @click="rug_pull">Pull Rug</button>
       </div>
       <br>
       <br>
