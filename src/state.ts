@@ -46,6 +46,7 @@ export const params = reactive({
   food_spawn_chance: 0.03,
   player_initial_bubbles: 512,
   market_trade_radius: 40,
+  econ_starting_number: 32,
   econ_initial_food: 30,
   econ_min_distance: 32,
   econ_velocity_change_chance: 0.01,
@@ -89,8 +90,8 @@ export function init(): State {
     bubbles: [],
     last_trade: null,
     price_history: [],
-    econs: 
-      n_random_pos_no_collisions(32, params.econ_min_distance).map(pos => econ(
+    econs:
+      n_random_pos_no_collisions(params.econ_starting_number, params.econ_min_distance).map(pos => econ(
       // [...Array(Math.round(Math.random() * 32)).keys()].map(() => econ(
         pos,
         {
