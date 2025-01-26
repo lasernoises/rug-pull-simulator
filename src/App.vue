@@ -205,7 +205,7 @@ const max_player_food = computed(() => {
 </script>
 
 <template>
-  <div style="display: flex; width: 100%; height: 100%">
+  <div style="display: flex; gap: 16px; padding: 16px; width: 100%; height: 100%">
     <svg
       style="flex-grow: 2; width: 100%; height: 100%; pointer-events: visible;"
       viewBox="-512 -512 1024 1024"
