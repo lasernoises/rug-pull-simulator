@@ -81,6 +81,7 @@ export type State = {
   avgValue: number, // avg bubble value
   deprecationFactor: number,
   highscore: number,
+  playerFoodCostPerSecond: number,
 };
 
 export function init(): State {
@@ -115,6 +116,7 @@ export function init(): State {
     avgValue: 0,
     deprecationFactor: 1,
     highscore,
+    playerFoodCostPerSecond: 0,
   };
 }
 
@@ -299,6 +301,8 @@ export function tick(state: State): boolean {
 
   const total_bubbles_picked_up = state.econs.map(e => e.bubbles).reduce((sum, bubbles) => sum + bubbles, 0);
   state.deprecationFactor = 1 - (total_bubbles_picked_up / params.player_initial_bubbles);
+
+  state.playerFoodCostPerSecond = state.player.marketing_people * params.marketing_person_salary + state.influencers.length * params.influencer_salary;
 
   if (state.ticks % 60 === 0) {
     state.player.food -= state.player.marketing_people * params.marketing_person_salary;

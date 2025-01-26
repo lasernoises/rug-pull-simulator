@@ -347,39 +347,43 @@ const max_price = computed(() => {
       <hr>
       <h3>Marketing</h3>
       <div>Marketing Points: {{ state.player.marketing_points }}</div>
+      <div>Marketing Cost: {{ state.playerFoodCostPerSecond }} food / second</div>
       <br>
       <button
         @click="state.player.marketing_points += params.marketing_point_increment"
         :disabled="isPaused"
         id="marketingFirstButton"
       >Brainstorm</button>
+      <span style="margin-left: 6px;">(+1 Marketing Points)</span>
       <br>
       <button
-        v-if="marketingDevices.billboard"
+        :disabled="state.player.marketing_points < params.billboard_price"
         @click="placing = 'billboardFirstLeg'"
       >
-        Deploy Billboard
+        Deploy Billboard 
       </button>
+      
+      <span style="margin-left: 6px;">(-{{ params.billboard_price }} Marketing Points)</span>
       <br>
-      <br>
-      <template v-if="state.player.marketing_people">
+      <template :disabled="state.player.marketing_people">
         Marketing People: {{ state.player.marketing_people }}
       </template>
-      <br>
       <button
-        v-if="state.player.food >= params.marketing_person_salary"
+      :disabled="state.player.food <= params.marketing_person_salary"
         @click="state.player.marketing_people += 1"
       >
-        Hire Marketing Person ({{ params.marketing_person_salary }} food / second)
+        Hire Marketing Person
       </button>
+      <span style="margin-left: 6px;">({{ params.marketing_person_salary }} food / second)</span>
       <br>
-      <br>
+
       <button
-        v-if="state.player.food >= params.influencer_salary"
+        :disabled="state.player.food <= params.influencer_salary"
         @click="place_influencer"
       >
         Hire Influencer ({{ params.influencer_salary }} food / second)
       </button>
+      <span style="margin-left: 6px;">({{ params.influencer_salary }} food / second)</span>
       <br>
 
       <!----------------- ECONOMY ----------------->
