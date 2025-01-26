@@ -169,7 +169,6 @@ export function tick(state: State) {
         dist(econ.pos, billboard[0]), // A circle of radius k around the first and second legs
         dist(econ.pos, billboard[1])
       );
-      //console.warn(`Billboard distance: p_coord=${p_coordinate}, n_coord=${scalarProduct(n, sub(econ.pos, billboard[0]))}, distance 1 = ${dist(econ.pos, billboard[0])}, 2 = ${dist(econ.pos, billboard[1])}`);
 
       if(distance < params.billboard_influence_radius) {
         econ.bubble_value_raw += params.billboard_influence_strength;
