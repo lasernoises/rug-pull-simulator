@@ -285,14 +285,19 @@ export function tick(state: State): boolean {
     state.food.push(random_pos());
   }
 
-  state.avgValue = computed(
-    () => state.econs
-      .map(e => e.bubble_value)
-      .reduce((a, b) => a + b, 0)
-      / state.econs.length,
-  ).value;
+  state.avgValue = state.econs
+    .map(e => e.bubble_value)
+    .reduce((a, b) => a + b, 0)
+    / state.econs.length;
 
-  const total_bubbles_picked_up = computed(() => state.econs.map(e => e.bubbles).reduce((sum, bubbles) => sum + bubbles, 0)).value;
+  if (state.ticks % 60 === 0) {
+    state.price_history.push(state.avgValue);
+    if (state.price_history.length > 64) {
+      state.price_history.splice(0, 1);
+    }
+  }
+
+  const total_bubbles_picked_up = state.econs.map(e => e.bubbles).reduce((sum, bubbles) => sum + bubbles, 0);
   state.deprecationFactor = 1 - (total_bubbles_picked_up / params.player_initial_bubbles);
 
   if (state.ticks % 60 === 0) {
@@ -398,9 +403,9 @@ function trade(state: State, a: Econ, b: Econ) {
   buyer.food -= amount * price;
   seller.food += amount * price;
 
-  state.last_trade = {
-    amount,
-    price,
-  };
-  state.price_history.push(price);
+  // state.last_trade = {
+  //   amount,
+  //   price,
+  // };
+  // state.price_history.push(price);
 }

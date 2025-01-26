@@ -379,8 +379,8 @@ const max_price = computed(() => {
         <button @click="rug_pull">Pull Rug</button>
       </div>
       <br>
-      <br>
-      Last Trade: {{ state.last_trade }}
+      <!-- <br> -->
+      <!-- Last Trade: {{ state.last_trade }} -->
       <br>
       Price History
       <br>
