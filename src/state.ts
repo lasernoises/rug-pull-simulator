@@ -72,7 +72,8 @@ export type State = {
   last_trade: { amount: number, price: number } | null,
   price_history: number[],
   avgValue: number, // avg bubble value
-  deprecationFactor: number;
+  deprecationFactor: number,
+  highscore: number,
 };
 
 export function init(): State {
@@ -100,6 +101,7 @@ export function init(): State {
     dead_econs: [],
     avgValue: 0,
     deprecationFactor: 1,
+    highscore: 0,
   });
 }
 

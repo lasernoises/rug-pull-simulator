@@ -132,10 +132,16 @@ const onSvgClick = () => {
 }
 
 const reset = () => {
+  if (state.value.player.food > state.value.highscore) {
+    state.value.highscore = state.value.player.food;
+  }
+  let highscore = state.value.highscore;
   state.value = init();
+  state.value.highscore = highscore;
   isPaused.value = false;
   activateMaxSpeed.value = false;
 };
+
 
 const max_price = computed(() => {
   return Math.max(0, ...state.value.price_history);
@@ -281,7 +287,7 @@ const max_price = computed(() => {
       Deprecation factor: {{ Math.round(state.deprecationFactor * 100) / 100 }}
       <br>
       Bubble Stockpile: {{ state.player.bubbles }} <br/>
-      Food: {{ Math.round(state.player.food * 100) / 100 }}
+      Food: {{ Math.round(state.player.food * 100) / 100 }} (Highscore: {{ Math.round(state.highscore * 100) / 100 }})
       <br>
       <br>
       <div style="display: flex; gap: 10px; margin-left: auto;">
