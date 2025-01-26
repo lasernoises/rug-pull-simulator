@@ -70,11 +70,11 @@ export async function doTutorial(
     placeBubblesButton.classList.remove("tutorial-highlight");
 
     await new Promise<void>((resolve, reject) => {
-        watch(() => { state.value.player.food }, resolve);
+        watch(() => state.value.player.food, () => {resolve();});
     });
 
     alert(
-        "This is how the game works. Try to make as much money as possible - your " + state.value.player.food + "$ are a good start!\n" +
+        "This is how the game works. Try to make as much money as possible - your " + Math.round(state.value.player.food * 100) / 100 + "$ are a good start!\n" +
         "Here are other things you can do:\n" +
         "  - Improve the bubble price by improving marketing.\n" +
         "  - Place bubbles to make profit. However, more bubbles in the markets will drive the price down.\n" +

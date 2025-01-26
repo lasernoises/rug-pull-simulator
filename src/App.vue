@@ -503,7 +503,7 @@ const max_player_food = computed(() => {
 </template>
 
 <style scoped>
-  .tutorial-highlight :not(:disabled) {
+  .tutorial-highlight:not(:disabled) {
     animation-name: blink-border;
     animation-duration: 2s;
     animation-timing-function: ease-in;
