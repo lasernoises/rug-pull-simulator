@@ -372,14 +372,16 @@ const max_player_food = computed(() => {
         @click="placing = 'billboardFirstLeg'"
         id="marketingBillboardButton"
       >
-        Deploy Billboard 
+        Deploy Billboard ({{ params.billboard_price }} marketing points)
       </button>
       
       <span style="margin-left: 6px;">(-{{ params.billboard_price }} Marketing Points)</span>
-      <br>
-      <template :disabled="state.player.marketing_people">
+      
+      <template v-if="state.player.marketing_people">
+        <br>
         Marketing People: {{ state.player.marketing_people }}
       </template>
+      <br>
       <button
       :disabled="state.player.food <= params.marketing_person_salary"
         @click="state.player.marketing_people += 1"
