@@ -11,6 +11,7 @@ const state = shallowRef(init());
 let isPaused = ref(false);
 let activateMaxSpeed = ref(false);
 let cashOut = ref(false);
+let activateDebugBuild = ref(true);
 
 const tutorialDone = ref<boolean>(localStorage.getItem("tutorialDone") !== null);
 
@@ -69,6 +70,10 @@ const handleCashOut = () => {
 
 const togglePause = () => {
   isPaused.value = !isPaused.value;
+};
+
+const toggleDebug = () => {
+  activateDebugBuild.value = !activateDebugBuild.value;
 };
 
 const toggleMaxSpeed = () => {
@@ -324,11 +329,12 @@ const max_price = computed(() => {
         <button type="button" @click=toggleMaxSpeed>{{ activateMaxSpeed ? 'Normal Speed' : 'Max Speed' }}</button>
         <button type="button" @click="reset">Reset</button>
         <button type="button" @click="cashOut = true">Cash Out</button>
+        <button type="button" @click="toggleDebug">{{ activateDebugBuild ? 'Deactivate Debug' : 'Active Debug' }}</button>
       </div>
       <button v-if="tutorialDone" @click="ev => { tutorialDone = false; ev.stopPropagation(); }">Redo tutorial</button>
 
       <br>
-      Marketing Points: {{ state.player.marketing_points }}
+      <div>Marketing Points: {{ state.player.marketing_points }}</div>
       <br>
       <button
         @click="state.player.marketing_points += params.marketing_point_increment"
@@ -363,12 +369,9 @@ const max_price = computed(() => {
         Hire Influencer ({{ params.influencer_salary }} food / second)
       </button>
       <br>
+      <div v-if="activateDebugBuild">Deprecation factor: {{ Math.round(state.deprecationFactor * 100) / 100 }}</div>
+      Bubble Stockpile: {{ state.player.bubbles }}
       <br>
-      Avg. Value: {{ Math.round(state.avgValue * 100) / 100 }}
-      <br>
-      Deprecation factor: {{ Math.round(state.deprecationFactor * 100) / 100 }}
-      <br>
-      Bubble Stockpile: {{ state.player.bubbles }} <br/>
       <span id="foodScore">Food: {{ Math.round(state.player.food * 100) / 100 }} (Highscore: {{ Math.round(state.highscore * 100) / 100 }})</span>
       <br>
       <div style="display: flex; gap: 10px; margin-left: auto;">
@@ -382,6 +385,8 @@ const max_price = computed(() => {
       <br>
       <!-- <br> -->
       <!-- Last Trade: {{ state.last_trade }} -->
+      <br>
+      Bubble Price: {{ Math.round(state.avgValue * 100) / 100 }}
       <br>
       Price History
       <br>
@@ -403,7 +408,7 @@ const max_price = computed(() => {
         ></polygon>
       </svg>
       <br>
-      <template v-for="param, name in params">
+      <template v-if="activateDebugBuild" v-for="param, name in params">
         <br>
         {{ name }}:
         <input type="number" v-model="params[name]"/>
