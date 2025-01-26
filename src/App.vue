@@ -1,21 +1,20 @@
 <script setup lang="ts">
 import { onMounted, computed, ref, watch } from "vue";
-import { dbg, init, tick, econ, random_pos, params, type Vec2 } from "./state.ts";
-import { scale, normalize, sub, add } from "./vector-algebra.ts";
+import { dbg, init, tick, econ, random_pos, params } from "./state.ts";
+import { scale, normalize, sub, add, type Vec2 } from "./vector-algebra.ts";
 import Grave from './Grave.vue';
 
 const state = ref(init());
 
 //let speed: number|undefined = undefined;
-let isPaused: boolean = false;
-let activateMaxSpeed: boolean = false;
+let isPaused = ref(false);
+let activateMaxSpeed = ref(false);
 
 const update = () => {
-
-  if (!isPaused) {
+  if (!isPaused.value) {
 
   tick(state.value);
-  if (activateMaxSpeed) {
+  if (activateMaxSpeed.value) {
     for (let i = 0; i < 10; i++) {
       tick(state.value);
     }
@@ -31,17 +30,11 @@ const update = () => {
 };
 
 const togglePause = () => {
-  isPaused = !isPaused;
-  // Need one more tick to update button text
-  tick(state.value);
-  requestAnimationFrame(update);
+  isPaused.value = !isPaused.value;
 };
 
 const toggleMaxSpeed = () => {
-  activateMaxSpeed = !activateMaxSpeed;
-  // Need one more tick to update button text
-  tick(state.value);
-  requestAnimationFrame(update);
+  activateMaxSpeed.value = !activateMaxSpeed.value;
 };
 
 const svgElement = ref<SVGGraphicsElement | undefined>();
@@ -132,7 +125,7 @@ const onSvgClick = () => {
       placing.value = "billboardSecondLeg";
       break;
     case "billboardSecondLeg":
-      state.value.billboards.push([previousLeg.value, nextLeg.value]);
+      state.value.billboards.push([previousLeg.value!, nextLeg.value]);
       state.value.player.marketing_points -= 20;
       placing.value = null;
   };
@@ -140,11 +133,8 @@ const onSvgClick = () => {
 
 const reset = () => {
   state.value = init();
-  isPaused = false;
-  activateMaxSpeed = false;
-    // Need to init tick in case reset happened during pause
-    tick(state.value);
-  requestAnimationFrame(update);
+  isPaused.value = false;
+  activateMaxSpeed.value = false;
 };
 
 const max_price = computed(() => {
