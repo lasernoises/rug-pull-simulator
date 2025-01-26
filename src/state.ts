@@ -19,6 +19,7 @@ export type Econ = {
   food: number;
   bubbles: number;
 
+  bubble_value_raw: number;
   bubble_value: number;
 };
 
@@ -28,7 +29,8 @@ export function econ(pos: Vec2, velocity: Vec2): Econ {
     velocity,
     food: params.econ_initial_food,
     bubbles: 0,
-    bubble_value: 0,
+    bubble_value_raw: 0,
+    bubble_value: 0, // adjusted for deprecation
   };
 }
 
@@ -69,7 +71,8 @@ export type State = {
   bubbles: Vec2[],
   last_trade: { amount: number, price: number } | null,
   price_history: number[],
-  avgValue: number,
+  avgValue: number, // avg bubble value
+  deprecationFactor: number;
 };
 
 export function init(): State {
@@ -96,6 +99,7 @@ export function init(): State {
       )),
     dead_econs: [],
     avgValue: 0,
+    deprecationFactor: 1,
   });
 }
 
@@ -125,7 +129,7 @@ function n_random_pos_no_collisions(n: number, entity_min_distance: number): Vec
 export function tick(state: State) {
   for (const i in state.econs) {
     const econ = state.econs[i];
-
+    econ.bubble_value = state.deprecationFactor*econ.bubble_value_raw;
 
     if (length(econ.pos) > 512) {
       econ.velocity = rebound(econ.velocity, minus(econ.pos));
@@ -155,7 +159,7 @@ export function tick(state: State) {
       const billboard = state.billboards[j];
       const distance = length(sub(econ.pos, billboard[0])) + length(sub(econ.pos, billboard[1]));
       if(distance < params.billboard_influence_radius) {
-        econ.bubble_value += params.billboard_influence_strength;
+        econ.bubble_value_raw += params.billboard_influence_strength;
       }
       if (distance < params.econ_min_distance) {
         const n = { x: billboard[1].y - billboard[0].y, y: -billboard[1].x + billboard[0].x };
@@ -179,9 +183,13 @@ export function tick(state: State) {
       const bubble = state.bubbles[j];
 
       if (length(sub(econ.pos, bubble)) < params.econ_bubble_collection_radius) {
-        econ.bubbles += 1;
-        state.player.food += state.avgValue;
-        state.bubbles.splice(Number(j), 1);
+
+        if (econ.food > econ.bubble_value * state.deprecationFactor) {
+          econ.bubbles += 1;
+          econ.food -= econ.bubble_value * state.deprecationFactor;
+          state.player.food += state.avgValue;
+          state.bubbles.splice(Number(j), 1);
+        }
 
         break;
       }
@@ -221,6 +229,9 @@ export function tick(state: State) {
       .reduce((a, b) => a + b, 0)
       / state.econs.length,
   ).value;
+
+  const total_bubbles_picked_up = computed(() => state.econs.map(e => e.bubbles).reduce((sum, bubbles) => sum + bubbles, 0)).value;
+  state.deprecationFactor = 1 - (total_bubbles_picked_up / params.player_initial_bubbles);
 }
 
 function trade_with_player(state: State, a: Econ) {

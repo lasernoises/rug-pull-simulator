@@ -6,7 +6,7 @@ import Grave from './Grave.vue';
 
 const state = ref(init());
 
-let speed: number|undefined = undefined;
+//let speed: number|undefined = undefined;
 let isPaused: boolean = false;
 let activateMaxSpeed: boolean = false;
 
@@ -135,6 +135,9 @@ const reset = () => {
   state.value = init();
   isPaused = false;
   activateMaxSpeed = false;
+    // Need to init tick in case reset happened during pause
+    tick(state.value);
+  requestAnimationFrame(update);
 };
 
 const max_price = computed(() => {
@@ -278,6 +281,8 @@ const max_price = computed(() => {
       <br>
       Avg. Value: {{ Math.round(state.avgValue * 100) / 100 }}
       <br>
+      Deprecation factor: {{ Math.round(state.deprecationFactor * 100) / 100 }}
+      <br>
       Bubble Stockpile: {{ state.player.bubbles }} <br/>
       Food: {{ Math.round(state.player.food * 100) / 100 }}
       <br>
@@ -287,7 +292,7 @@ const max_price = computed(() => {
           @click="placing === 'bubbles' ? placing = null : placing = 'bubbles'"
         >Place Bubbles</button>
         <br>
-        <button @click="bulk_place_bubbles">Bulk Place Bubbles</button>
+        <button @click="bulk_place_bubbles">Mass Place Bubbles</button>
       </div>
       <br>
       <br>
