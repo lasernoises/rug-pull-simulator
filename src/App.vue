@@ -131,6 +131,16 @@ const rug_pull = () => {
   state.value.player.bubbles = 0;
 };
 
+const place_influencer = () => {
+  state.value.influencers.push({
+    pos: random_pos(),
+    velocity: {
+        x: Math.random() * 2 - 1,
+        y: Math.random() * 2 - 1,
+    },
+  });
+};
+
 const onSvgClick = () => {
   const pos = mousePos.value!;
 
@@ -152,8 +162,10 @@ const onSvgClick = () => {
       break;
     case "billboardSecondLeg":
       state.value.billboards.push([previousLeg.value!, nextLeg.value]);
-      state.value.player.marketing_points -= 20;
-      placing.value = "billboardFirstLeg";
+      state.value.player.marketing_points -= params.billboard_price;
+      placing.value = state.value.player.marketing_points < params.billboard_price
+        ? null
+        : "billboardFirstLeg";
   };
 }
 
@@ -255,6 +267,17 @@ const max_price = computed(() => {
         >{{ Math.round(econ.food) }}</text>
       </template>
 
+      <template
+        v-for="influencer in state.influencers"
+      >
+        <circle
+          :cx="influencer.pos.x"
+          :cy="influencer.pos.y"
+          fill="red"
+          r="16"
+        ></circle>
+      </template>
+
       <circle cx="0" cy="0" r="32" fill="blue"/>
 
       <template v-if="mousePos !== null">
@@ -316,12 +339,20 @@ const max_price = computed(() => {
       <template v-if="state.player.marketing_people">
         Marketing People: {{ state.player.marketing_people }}
       </template>
-
+      <br>
       <button
         v-if="state.player.food >= params.marketing_person_salary"
         @click="state.player.marketing_people += 1"
       >
         Hire Marketing Person ({{ params.marketing_person_salary }} food / second)
+      </button>
+      <br>
+      <br>
+      <button
+        v-if="state.player.food >= params.influencer_salary"
+        @click="place_influencer"
+      >
+        Hire Influencer ({{ params.influencer_salary }} food / second)
       </button>
       <br>
       <br>

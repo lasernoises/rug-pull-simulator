@@ -60,9 +60,11 @@ export const params = reactive({
   billboard_influence_strength: 0.001,
   billboard_length: 50,
   billboard_price: 20,
-  influencer_price: 50,
   marketing_point_increment: 1,
   marketing_person_salary: 0.2,
+  influencer_salary: 2,
+  influencer_influence_radius: 128,
+  influencer_influence_strength: 0.02,
 });
 
 export type State = {
@@ -73,6 +75,7 @@ export type State = {
   billboards: [Vec2, Vec2][],
   food: Vec2[],
   bubbles: Vec2[],
+  influencers: { pos: Vec2, velocity: Vec2 }[],
   last_trade: { amount: number, price: number } | null,
   price_history: number[],
   avgValue: number, // avg bubble value
@@ -94,6 +97,7 @@ export function init(): State {
     billboards: [],
     food: [],
     bubbles: [],
+    influencers: [],
     last_trade: null,
     price_history: [],
     econs:
@@ -190,6 +194,20 @@ export function tick(state: State): boolean {
       }
     }
 
+    for (const j in state.influencers) {
+      const influencer = state.influencers[j];
+
+      if (length(sub(econ.pos, influencer.pos)) < params.billboard_influence_radius) {
+        econ.bubble_value_raw += params.influencer_influence_strength;
+      }
+
+      if (length(sub(econ.pos, influencer.pos)) < params.econ_min_distance) {
+        const tmp = econ.velocity;
+        econ.velocity = influencer.velocity;
+        influencer.velocity = tmp;
+      }
+    }
+
     for (const j in state.food) {
       const food = state.food[j];
 
@@ -233,6 +251,25 @@ export function tick(state: State): boolean {
     }
   }
 
+  
+  for (const i in state.influencers) {
+    const influencer = state.influencers[i];
+
+    influencer.pos.x += influencer.velocity.x;
+    influencer.pos.y += influencer.velocity.y;
+
+    if (Math.random() < params.econ_velocity_change_chance) {
+      influencer.velocity = {
+        x: Math.random() * 2 - 1,
+        y: Math.random() * 2 - 1,
+      };
+    }
+
+    if (length(influencer.pos) > 512) {
+      influencer.velocity = rebound(influencer.velocity, minus(influencer.pos));
+    }
+  }
+
   state.econs.forEach(e => { e.food -= params.econ_food_consumption; })
 
   let alive_econs: Econ[] = [];
@@ -259,6 +296,8 @@ export function tick(state: State): boolean {
   if (state.ticks % 60 === 0) {
     state.player.food -= state.player.marketing_people * params.marketing_person_salary;
     state.player.marketing_points += state.player.marketing_people;
+
+    state.player.food -= state.influencers.length * params.influencer_salary;
   }
 
   const alive = state.player.food >= 0;
