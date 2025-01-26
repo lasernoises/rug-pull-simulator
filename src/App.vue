@@ -229,7 +229,9 @@ const max_price = computed(() => {
           :cx="pos.x"
           :cy="pos.y"
           r="16"
-          fill="green"
+          fill="#90a0ff"
+          stroke="blue"
+          stroke-width="2"
         ></circle>
       </template>
 
