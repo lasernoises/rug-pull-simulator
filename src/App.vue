@@ -7,9 +7,14 @@ import Grave from './Grave.vue';
 const state = ref(init());
 
 let speed: number|undefined = undefined;
+let isPaused: boolean = false;
 
 const update = () => {
-  tick(state.value);
+
+  if (!isPaused) {
+    tick(state.value);
+  }
+
   if(speed === undefined){
     requestAnimationFrame(update);
   } else {
@@ -113,6 +118,7 @@ const onSvgClick = () => {
 
 const reset = () => {
   state.value = init();
+  isPaused = false;
 };
 
 const max_price = computed(() => {
@@ -234,7 +240,12 @@ const max_price = computed(() => {
 
     </svg>
     <div style="flex-grow: 1; width: 100%; height: 100%">
-      <button type="checkbox" @click="speed = 0">Max Speed</button>
+      <div style="display: flex; gap: 10px; margin-left: auto;">
+        <button type="button" @click="speed = 0; isPaused=false">Max speed</button>
+        <button type="button" @click="isPaused = !isPaused">Pause</button>
+        <button @click="reset">Reset</button>
+      </div>
+
       <br>
       Marketing Points: {{ state.player.marketing_points }}
       <br>
@@ -291,7 +302,6 @@ const max_price = computed(() => {
       <br>Buying Price:<input type="number" v-model="state.player.buying_price">
       <br>
       <br>
-      <button @click="reset">Reset</button>
     </div>
   </div>
 </template>
