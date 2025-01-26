@@ -292,9 +292,9 @@ export function tick(state: State): boolean {
 
   if (state.ticks % 60 === 0) {
     state.price_history.push(state.avgValue);
-    if (state.price_history.length > 64) {
-      state.price_history.splice(0, 1);
-    }
+    // if (state.price_history.length > 64) {
+    //   state.price_history.splice(0, 1);
+    // }
   }
 
   const total_bubbles_picked_up = state.econs.map(e => e.bubbles).reduce((sum, bubbles) => sum + bubbles, 0);

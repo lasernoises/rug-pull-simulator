@@ -387,8 +387,9 @@ const max_price = computed(() => {
       <br>
       <svg
         v-if="state.price_history.length > -1"
-        width="256"
+        width="100%"
         height="128"
+        viewBox="0 0 256 128"
       >
         <polygon
           :points="
