@@ -274,6 +274,7 @@ const max_player_food = computed(() => {
             :food="econ.food"
             :bubbles="econ.bubbles"
             :bubble_value="econ.bubble_value"
+            :activate-debug-build="activateDebugBuild"
           ></Econ>
       </template>
 
