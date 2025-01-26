@@ -111,15 +111,7 @@ onMounted(() => {
 const placing = ref<"bubbles" | "billboardFirstLeg" | "billboardSecondLeg" | null>(null);
 const previousLeg = ref<Vec2|null>(null);
 const nextLeg = computed(() => {
-  const pretty = a => `${a.x} ${a.y}`;
   let result = add(previousLeg.value, scale(normalize(sub(mousePos.value, previousLeg.value)), params.billboard_length));
-  console.warn(`Previous: ${pretty(previousLeg.value)};
-    Next: ${pretty(mousePos.value)};
-    minus: ${pretty(sub(mousePos.value, previousLeg.value))};
-    normalize: ${pretty(normalize(sub(mousePos.value, previousLeg.value)))};
-    scale: ${pretty(scale(normalize(sub(mousePos.value, previousLeg.value)), params.billboard_length))};
-    add: ${pretty(add(previousLeg.value, scale(normalize(sub(mousePos.value, previousLeg.value)), params.billboard_length)))};
-    Computing nextLeg as ${pretty(result)}`);
   return result;
 });
 
