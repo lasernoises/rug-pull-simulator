@@ -3,6 +3,7 @@ import { onMounted, computed, ref, watch, shallowRef, triggerRef } from "vue";
 import { dbg, init, tick, econ, random_pos, params } from "./state.ts";
 import { scale, normalize, sub, add, type Vec2 } from "./vector-algebra.ts";
 import Grave from './Grave.vue';
+import { doTutorial } from './tutorial';
 
 const state = shallowRef(init());
 
@@ -10,6 +11,19 @@ const state = shallowRef(init());
 let isPaused = ref(false);
 let activateMaxSpeed = ref(false);
 let cashOut = ref(false);
+
+const tutorialDone = ref<boolean>(localStorage.getItem("tutorialDone") !== null);
+
+if(!tutorialDone.value) {
+  doTutorial().then(() => { tutorialDone.value = true; });
+}
+watch(tutorialDone, (val: boolean) => {
+  if(val) localStorage.setItem("tutorialDone", "y");
+  else {
+    localStorage.removeItem("tutorialDone");
+    doTutorial().then(() => { tutorialDone.value = true; });
+  }
+});
 
 const update = () => {
   if (!isPaused.value) {
@@ -319,6 +333,7 @@ const max_price = computed(() => {
         <button type="button" @click="reset">Reset</button>
         <button type="button" @click="cashOut = true">Cash Out</button>
       </div>
+      <button v-if="tutorialDone" @click="tutorialDone = false">Redo tutorial</button>
 
       <br>
       Marketing Points: {{ state.player.marketing_points }}
