@@ -289,8 +289,6 @@ const max_price = computed(() => {
         ></circle>
       </template>
 
-      <circle cx="0" cy="0" r="32" fill="blue"/>
-
       <template v-if="mousePos !== null">
         <circle
           v-if="placing === 'billboardFirstLeg'"

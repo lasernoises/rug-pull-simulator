@@ -238,9 +238,9 @@ export function tick(state: State): boolean {
       }
     }
 
-    if (length(econ.pos) < params.market_trade_radius) {
-      trade_with_player(state, econ);
-    }
+    // if (length(econ.pos) < params.market_trade_radius) {
+    //   trade_with_player(state, econ);
+    // }
 
     econ.pos.x += econ.velocity.x;
     econ.pos.y += econ.velocity.y;
