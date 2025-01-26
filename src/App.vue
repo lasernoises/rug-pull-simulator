@@ -15,15 +15,13 @@ let cashOut = ref(false);
 let activateDebugBuild = ref(false);
 
 const tutorialDone = ref<boolean>(localStorage.getItem("tutorialDone") !== null);
+const tutorialHighlighter = ref<Vec2|null>(null);
 
-if(!tutorialDone.value) {
-  doTutorial().then(() => { tutorialDone.value = true; });
-}
 watch(tutorialDone, (val: boolean) => {
   if(val) localStorage.setItem("tutorialDone", "y");
   else {
     localStorage.removeItem("tutorialDone");
-    doTutorial().then(() => { tutorialDone.value = true; });
+    doTutorial(isPaused, state, tutorialHighlighter, placing).then(() => { tutorialDone.value = true; });
   }
 });
 
@@ -113,6 +111,9 @@ const mousePos = ref<Vec2 | null>(null);//{x: 0, y: 0};
 
 onMounted(() => {
   update();
+  if(!tutorialDone.value) {
+    setTimeout(() => { doTutorial(isPaused, state, tutorialHighlighter, placing).then(() => { tutorialDone.value = true; }); }, 1000);
+  }
 });
 
 const placing = ref<"bubbles" | "billboardFirstLeg" | "billboardSecondLeg" | null>(null);
@@ -210,6 +211,7 @@ const max_player_food = computed(() => {
       style="flex-grow: 2; width: 100%; height: 100%; pointer-events: visible;"
       viewBox="-512 -512 1024 1024"
       ref="svgElement"
+      id="svgCanvas"
       @click="onSvgClick"
     >
       <circle
@@ -325,6 +327,17 @@ const max_player_food = computed(() => {
         ></line>
       </template>
 
+      <circle
+        v-if="tutorialHighlighter !== null"
+        r="30"
+        :cx="tutorialHighlighter.x"
+        :cy="tutorialHighlighter.y"
+        class="tutorial-highlight"
+        fill="transparent"
+        stroke="yellow"
+        stroke-width="2px"
+      ></circle>
+
     </svg>
     <div style="flex-grow: 1; width: 100%; height: 100%">
       <br>
@@ -356,6 +369,7 @@ const max_player_food = computed(() => {
       <button
         :disabled="state.player.marketing_points < params.billboard_price"
         @click="placing = 'billboardFirstLeg'"
+        id="marketingBillboardButton"
       >
         Deploy Billboard 
       </button>
@@ -388,6 +402,7 @@ const max_player_food = computed(() => {
       <h2>Player Economy</h2>
       <div style="display: flex; gap: 10px; margin-left: auto; margin-top: 0.5em;">
         <button 
+          id="placeBubblesButton"
           @click="placing === 'bubbles' ? placing = null : placing = 'bubbles'"
         >Place Bubbles</button>
         <button @click="bulk_place_bubbles">Mass Place Bubbles</button>
@@ -488,19 +503,28 @@ const max_player_food = computed(() => {
 </template>
 
 <style scoped>
-  .tutorial-highlight {
-    animation-name: blink;
+  .tutorial-highlight :not(:disabled) {
+    animation-name: blink-border;
     animation-duration: 2s;
     animation-timing-function: ease-in;
     animation-iteration-count: infinite;
   }
 
-  @keyframes blink {
+  @keyframes blink-border {
     from {
       border: 2pt solid yellow;
     }
     to {
       border: 2pt solid transparent;
     }
+  }
+
+  @keyframes blink {
+    from { stroke: yellow; }
+    to { stroke: transparent; }
+  }
+
+  #tutorialHighlightSvg {
+    animation-name: blink;
   }
 </style>
