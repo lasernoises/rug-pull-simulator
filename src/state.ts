@@ -40,6 +40,7 @@ export type Player = {
   selling_price: number,
   buying_price: number,
   marketing_points: number,
+  marketing_people: number,
 };
 
 export const params = reactive({
@@ -60,10 +61,12 @@ export const params = reactive({
   billboard_length: 50,
   billboard_price: 20,
   influencer_price: 50,
-  marketing_point_increment: 20,
+  marketing_point_increment: 1,
+  marketing_person_salary: 0.2,
 });
 
 export type State = {
+  ticks: number,
   player: Player,
   econs: Econ[],
   dead_econs: Econ[],
@@ -79,11 +82,14 @@ export type State = {
 
 export function init(): State {
   return {
+    ticks: 0,
     player: {
       bubbles: params.player_initial_bubbles,
       marketing_points: 0,
       food: 0,
-      buying_price: 0, selling_price: 100,
+      buying_price: 0,
+      selling_price: 100,
+      marketing_people: 0,
     },
     billboards: [],
     food: [],
@@ -129,7 +135,9 @@ function n_random_pos_no_collisions(n: number, entity_min_distance: number): Vec
   return result;
 }
 
-export function tick(state: State) {
+export function tick(state: State): boolean {
+  state.ticks += 1;
+
   for (const i in state.econs) {
     const econ = state.econs[i];
     econ.bubble_value = state.deprecationFactor*econ.bubble_value_raw;
@@ -247,6 +255,15 @@ export function tick(state: State) {
 
   const total_bubbles_picked_up = computed(() => state.econs.map(e => e.bubbles).reduce((sum, bubbles) => sum + bubbles, 0)).value;
   state.deprecationFactor = 1 - (total_bubbles_picked_up / params.player_initial_bubbles);
+
+  if (state.ticks % 60 === 0) {
+    state.player.food -= state.player.marketing_people * params.marketing_person_salary;
+    state.player.marketing_points += state.player.marketing_people;
+  }
+
+  const alive = state.player.food >= 0;
+
+  return alive;
 }
 
 function trade_with_player(state: State, a: Econ) {

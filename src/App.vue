@@ -12,11 +12,19 @@ let activateMaxSpeed = ref(false);
 
 const update = () => {
   if (!isPaused.value) {
-    tick(state.value);
-    if (activateMaxSpeed.value) {
+    let alive = tick(state.value);
+    if (alive && activateMaxSpeed.value) {
       for (let i = 0; i < 10; i++) {
-        tick(state.value);
+        if (!tick(state.value)) {
+          alive = false;
+          break;
+        };
       }
+    }
+
+    if (!alive) {
+      window.alert("Game Over! You can't feed your marketing departement anymore!");
+      reset();
     }
   }
   triggerRef(state);
@@ -275,13 +283,28 @@ const max_price = computed(() => {
       <br>
       Marketing Points: {{ state.player.marketing_points }}
       <br>
-      <button @click="state.player.marketing_points += 20">Brainstorm</button>
+      <button
+        @click="state.player.marketing_points += params.marketing_point_increment"
+        :disabled="isPaused"
+      >Brainstorm</button>
       <br>
       <button
         v-if="marketingDevices.billboard"
         @click="placing = 'billboardFirstLeg'"
       >
         Deploy Billboard
+      </button>
+      <br>
+      <br>
+      <template v-if="state.player.marketing_people">
+        Marketing People: {{ state.player.marketing_people }}
+      </template>
+
+      <button
+        v-if="state.player.food >= params.marketing_person_salary"
+        @click="state.player.marketing_people += 1"
+      >
+        Hire Marketing Person ({{ params.marketing_person_salary }} food / second)
       </button>
       <br>
       <br>
