@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { onMounted, computed, ref, watch } from "vue";
 import { onMounted, computed, ref, watch, shallowRef, triggerRef } from "vue";
 import { dbg, init, tick, econ, random_pos, params } from "./state.ts";
 import { scale, normalize, sub, add, type Vec2 } from "./vector-algebra.ts";
@@ -122,13 +121,16 @@ const onSvgClick = () => {
       return;
       // break;
     case "billboardFirstLeg":
+      if (state.value.player.marketing_points <= 0) {
+        return;
+      }
       previousLeg.value = pos;
       placing.value = "billboardSecondLeg";
       break;
     case "billboardSecondLeg":
       state.value.billboards.push([previousLeg.value!, nextLeg.value]);
       state.value.player.marketing_points -= 20;
-      placing.value = null;
+      placing.value = "billboardFirstLeg";
   };
 }
 
