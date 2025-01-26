@@ -406,6 +406,7 @@ const max_price = computed(() => {
         v-if="state.price_history.length > -1"
         width="100%"
         height="128"
+        preserveAspectRatio="none"
         viewBox="0 0 256 128"
       >
         <polygon
