@@ -30,9 +30,9 @@ export function length(vec: Vec2): number {
   const x = Math.abs(vec.x);
   const y = Math.abs(vec.y);
   return Math.abs(Math.sqrt(x * x + y * y));
-} 
+}
 
-function dist(a: Vec2, b: Vec2) {
+export function dist(a: Vec2, b: Vec2) {
   return length(sub(a, b));
 }
 

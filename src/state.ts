@@ -1,6 +1,6 @@
 import { reactive, computed } from "vue";
 import type { Vec2 } from "./vector-algebra";
-import { length, sub, rebound, minus, scalarProduct } from './vector-algebra';
+import { length, sub, rebound, minus, scalarProduct, dist, normalize } from './vector-algebra';
 
 export function dbg<T>(t: T): T {
   console.log(t);
@@ -159,13 +159,26 @@ export function tick(state: State) {
 
     for (const j in state.billboards) {
       const billboard = state.billboards[j];
-      const distance = length(sub(econ.pos, billboard[0])) + length(sub(econ.pos, billboard[1]));
+      // Coordinate along an axis parallel to the billboard; the first leg is at 0, the second at 1
+      const p_coordinate = scalarProduct(sub(econ.pos, billboard[0]), sub(billboard[1], billboard[0])) / Math.pow(dist(billboard[1], billboard[0]), 2);
+      // An axis normal to the billboard
+      const n = normalize({ x: billboard[1].y - billboard[0].y, y: -billboard[1].x + billboard[0].x });
+      const distance = Math.min( // Assembling a shape around the billboard out of the union of
+        (p_coordinate >= 0 && p_coordinate <= 1) ? Math.abs(scalarProduct(n, sub(econ.pos, billboard[0]))) : Infinity, // a rectangle of width k around the billboard line
+        dist(econ.pos, billboard[0]), // A circle of radius k around the first and second legs
+        dist(econ.pos, billboard[1])
+      );
+      //console.warn(`Billboard distance: p_coord=${p_coordinate}, n_coord=${scalarProduct(n, sub(econ.pos, billboard[0]))}, distance 1 = ${dist(econ.pos, billboard[0])}, 2 = ${dist(econ.pos, billboard[1])}`);
+
       if(distance < params.billboard_influence_radius) {
         econ.bubble_value_raw += params.billboard_influence_strength;
       }
       if (distance < params.econ_min_distance) {
-        const n = { x: billboard[1].y - billboard[0].y, y: -billboard[1].x + billboard[0].x };
-        econ.velocity = rebound(econ.velocity, n);
+        if(scalarProduct(n, sub(econ.pos, billboard[0])) > 0) {
+          econ.velocity = rebound(econ.velocity, n);
+        } else {
+          econ.velocity = rebound(econ.velocity, minus(n));
+        }
       }
     }
 
