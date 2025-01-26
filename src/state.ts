@@ -84,6 +84,8 @@ export type State = {
 };
 
 export function init(): State {
+  const highscore: number = Number.parseFloat(window.localStorage.getItem("highscore") ?? "0");
+
   return {
     ticks: 0,
     player: {
@@ -112,7 +114,7 @@ export function init(): State {
     dead_econs: [],
     avgValue: 0,
     deprecationFactor: 1,
-    highscore: 0,
+    highscore,
   };
 }
 

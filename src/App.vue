@@ -179,9 +179,8 @@ const reset = () => {
   if (state.value.player.food > state.value.highscore) {
     state.value.highscore = state.value.player.food;
   }
-  let highscore = state.value.highscore;
+  window.localStorage.setItem("highscore", String(state.value.highscore));
   state.value = init();
-  state.value.highscore = highscore;
   isPaused.value = false;
   activateMaxSpeed.value = false;
   cashOut.value = false;
