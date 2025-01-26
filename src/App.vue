@@ -196,6 +196,11 @@ const reset = () => {
 const max_price = computed(() => {
   return Math.max(0, ...state.value.price_history);
 });
+
+const max_player_food = computed(() => {
+  return Math.max(0, ...state.value.player_food_history);
+});
+
 </script>
 
 <template>
@@ -376,7 +381,7 @@ const max_price = computed(() => {
       >
         Hire Marketing Person
       </button>
-      <span style="margin-left: 6px;">({{ params.marketing_person_salary }} food / second)</span>
+      <span style="margin-left: 6px;">(-{{ params.marketing_person_salary }} food / second)</span>
       <br>
 
       <button
@@ -385,25 +390,41 @@ const max_price = computed(() => {
       >
         Hire Influencer ({{ params.influencer_salary }} food / second)
       </button>
-      <span style="margin-left: 6px;">({{ params.influencer_salary }} food / second)</span>
+      <span style="margin-left: 6px;">(-{{ params.influencer_salary }} food / second)</span>
       <br>
 
       <!----------------- ECONOMY ----------------->
       <br>
       <hr>
       <h3>Player Economy</h3>
-      <span id="foodScore">Player Food: {{ Math.round(state.player.food * 100) / 100 }} (Highscore: {{ Math.round(state.highscore * 100) / 100 }})</span>
-      <br>
-      Bubble Stockpile: {{ state.player.bubbles }}
-      <br>
-      <div style="display: flex; gap: 10px; margin-left: auto;">
+      <div style="display: flex; gap: 10px; margin-left: auto; margin-top: 0.5em;">
         <button 
           @click="placing === 'bubbles' ? placing = null : placing = 'bubbles'"
         >Place Bubbles</button>
-        <br>
         <button @click="bulk_place_bubbles">Mass Place Bubbles</button>
         <button @click="rug_pull">Pull Rug</button>
+        Bubble Stockpile: {{ state.player.bubbles }}
       </div>
+      <div style="margin-top: 0.5em;"><span id="foodScore">Player Food: {{ Math.round(state.player.food * 100) / 100 }} (Highscore: {{ Math.round(state.highscore * 100) / 100 }})</span></div>
+      <svg
+        v-if="state.player_food_history.length > -1"
+        width="100%"
+        height="128"
+        preserveAspectRatio="none"
+        viewBox="0 0 256 128"
+      >
+        <polygon
+          :points="
+            '256,128 0,128 '
+              + state.player_food_history
+                  .map((p, i) => `${256 / (state.player_food_history.length - 1) * i},${128 - p / max_player_food * 128}` )
+                  .join(' ')
+          "
+          fill="white"
+        ></polygon>
+      </svg>
+
+
       <br>
       <hr>
       <h3>Price History</h3>

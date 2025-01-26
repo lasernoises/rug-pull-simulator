@@ -78,6 +78,7 @@ export type State = {
   influencers: { pos: Vec2, velocity: Vec2 }[],
   last_trade: { amount: number, price: number } | null,
   price_history: number[],
+  player_food_history: number[],
   avgValue: number, // avg bubble value
   deprecationFactor: number,
   highscore: number,
@@ -103,6 +104,7 @@ export function init(): State {
     influencers: [],
     last_trade: null,
     price_history: [],
+    player_food_history: [],
     econs:
       n_random_pos_no_collisions(params.econ_starting_number, params.econ_min_distance).map(pos => econ(
       // [...Array(Math.round(Math.random() * 32)).keys()].map(() => econ(
@@ -294,6 +296,7 @@ export function tick(state: State): boolean {
 
   if (state.ticks % 60 === 0) {
     state.price_history.push(state.avgValue);
+    state.player_food_history.push(state.player.food);
     // if (state.price_history.length > 64) {
     //   state.price_history.splice(0, 1);
     // }
