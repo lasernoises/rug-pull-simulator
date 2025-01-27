@@ -45,6 +45,7 @@ export type Player = {
 
 export const params = reactive({
   food_spawn_chance: 0.03,
+  food_max_amount: 128,
   player_initial_bubbles: 512,
   market_trade_radius: 40,
   econ_starting_number: 32,
@@ -166,7 +167,8 @@ export function tick(state: State): boolean {
     if (length(econ.pos) > 512) {
       econ.velocity = rebound(econ.velocity, minus(econ.pos));
     }
-
+    
+    /*
     for (const j in state.econs) {
       const other = state.econs[j];
 
@@ -178,6 +180,7 @@ export function tick(state: State): boolean {
 
       if (i >= j) continue; // below is only once per pair
 
+      
       if (length(sub(econ.pos, other.pos)) < params.econ_min_distance) {
         const tmp = econ.velocity;
         econ.velocity = other.velocity;
@@ -185,7 +188,7 @@ export function tick(state: State): boolean {
 
         trade(state, econ, other);
       }
-    }
+    }*/
 
     for (const j in state.billboards) {
       const billboard = state.billboards[j];
@@ -334,7 +337,7 @@ export function tick(state: State): boolean {
   });
   state.econs = alive_econs;
 
-  if (Math.random() < params.food_spawn_chance) {
+  if (Math.random() < params.food_spawn_chance && state.food.length < params.food_max_amount) {
     state.food.push(random_pos());
   }
 
@@ -356,10 +359,10 @@ export function tick(state: State): boolean {
   let fraction_dead = state.dead_econs.length / params.econ_starting_number;
   state.deprecationFactor = 1 - Math.max(total_bubbles_picked_up / params.player_initial_bubbles, fraction_dead);
 
-  state.playerFoodCostPerSecond = state.player.marketing_people * params.marketing_person_salary + state.influencers.length * params.influencer_salary;
+  state.playerFoodCostPerSecond = state.player.marketing_people * state.player.marketing_people * params.marketing_person_salary + state.influencers.length * params.influencer_salary;
 
   if (state.ticks % 60 === 0) {
-    state.player.food -= state.player.marketing_people * params.marketing_person_salary;
+    state.player.food -= state.player.marketing_people * state.player.marketing_people * params.marketing_person_salary;
     state.player.marketing_points += state.player.marketing_people;
 
     state.player.food -= state.influencers.length * params.influencer_salary;

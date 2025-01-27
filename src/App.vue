@@ -63,8 +63,8 @@ const handleGameOver = (alive: boolean) => {
       return; // need to draw one more tick so that last econ icon changes to cross
     }
     if (isGameOver.value) {
-      window.alert("Game Over! Everyone is dead!");
-      reset();
+      window.alert("Everyone is dead! Take the money and run!");
+      handleCashOut();
     }
 };
 
@@ -406,6 +406,13 @@ const max_player_food = computed(() => {
       >Brainstorm</button>
       <span style="margin-left: 6px;">(+1 Marketing Points)</span>
       <br>
+      <div v-if="activateDebugBuild">
+        <button
+            @click="state.player.marketing_points += 100"
+          >+100 Marketing Points
+        </button>
+        <br>
+      </div>
       <button
         :disabled="state.player.marketing_points < params.billboard_price"
         @click="placing = 'billboardFirstLeg'"
@@ -422,12 +429,12 @@ const max_player_food = computed(() => {
       </template>
       <br>
       <button
-      :disabled="state.player.food <= params.marketing_person_salary"
+      :disabled="state.player.food <= 2 * state.player.marketing_people * params.marketing_person_salary + params.marketing_person_salary"
         @click="state.player.marketing_people += 1"
       >
         Hire Marketing Person
       </button>
-      <span style="margin-left: 6px;">(+1 Marketing Points / second, -${{ params.marketing_person_salary }} / second)</span>
+      <span style="margin-left: 6px;">(+1 Marketing Points / second, -${{ 2 * state.player.marketing_people * params.marketing_person_salary + params.marketing_person_salary }} / second)</span>
       <br>
       <button
         :disabled="state.player.food <= params.influencer_salary"
@@ -449,6 +456,13 @@ const max_player_food = computed(() => {
         >Place Bubbles</button>
         <button @click="bulk_place_bubbles">Mass Place Bubbles</button>
         <button @click="rug_pull">Pull Rug</button>
+      </div>
+      <div v-if="activateDebugBuild">
+        <button
+            @click="state.player.food += 1000"
+          >+$1000
+        </button>
+        <br>
       </div>
       <div style="margin-top: 0.5em">Bubble Stockpile: {{ state.player.bubbles }}</div>
       <div style="margin-top: 0.5em;"><span id="foodScore">Player: ${{ Math.round(state.player.food * 100) / 100 }} (Highscore: ${{ Math.round(state.highscore * 100) / 100 }})</span></div>
@@ -541,7 +555,6 @@ const max_player_food = computed(() => {
         ></circle>
       </svg>
     </div>
-    <!-- Input field for entering the cheat code -->
      <br>
      <br>
      <br>
@@ -550,6 +563,7 @@ const max_player_food = computed(() => {
      <br>
      <br>
      <br>
+      <!-- Input field for entering the cheat code -->
       <input 
         v-if="!isCheatCodeValid"
         type="text" 
