@@ -13,6 +13,7 @@ let isPaused = ref(false);
 let activateMaxSpeed = ref(false);
 let cashOut = ref(false);
 let activateDebugBuild = ref(false);
+let isGameOver = ref(false);
 
 const tutorialDone = ref<boolean>(localStorage.getItem("tutorialDone") !== null);
 const tutorialHighlighter = ref<Vec2|null>(null);
@@ -37,10 +38,7 @@ const update = () => {
       }
     }
 
-    if (!alive) {
-      window.alert("Game Over! You can't feed your marketing department / influencer hype-squad anymore!");
-      reset();
-    }
+    handleGameOver(alive);
 
     if (cashOut.value) {
       handleCashOut();
@@ -48,12 +46,23 @@ const update = () => {
   }
   triggerRef(state);
   requestAnimationFrame(update);
-  /*
-  if(speed === undefined){
-    requestAnimationFrame(update);
-  } else {
-    setTimeout(update, speed);
-  }*/
+};
+
+const handleGameOver = (alive: boolean) => {
+    console.log("hgo");
+    if (!alive) {
+      window.alert("Game Over! You can't feed your marketing department / influencer hype-squad anymore!");
+      reset();
+    }
+
+    if ((state.value.econs.length === 0) && !isGameOver.value) {
+      isGameOver.value = true;
+      return; // need to draw one more tick so that last econ icon changes to cross
+    }
+    if (isGameOver.value) {
+      window.alert("Game Over! Everyone is dead!");
+      reset();
+    }
 };
 
 const handleCashOut = () => {
@@ -192,6 +201,7 @@ const reset = () => {
   isPaused.value = false;
   activateMaxSpeed.value = false;
   cashOut.value = false;
+  isGameOver.value = false;
 };
 
 
@@ -364,8 +374,8 @@ const max_player_food = computed(() => {
         <button type="button" @click=toggleMaxSpeed>{{ activateMaxSpeed ? 'Normal Speed' : 'Max Speed' }}</button>
         <button v-if="activateDebugBuild" type="button" @click="reset">Reset</button>
         <button type="button" @click="cashOut = true">Cash Out</button>
-        <!---<button type="button" @click="toggleDebug">{{ activateDebugBuild ? 'Deactivate Debug' : 'Active Debug' }}</button>--->
         <button v-if="tutorialDone" @click="ev => { tutorialDone = false; ev.stopPropagation(); }">Redo tutorial</button>
+        <button type="button" @click="toggleDebug">{{ activateDebugBuild ? 'Deactivate Debug' : 'Active Debug' }}</button>
       </div>
       <br>
 

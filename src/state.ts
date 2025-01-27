@@ -351,8 +351,6 @@ export function tick(state: State): boolean {
     // }
   }
 
-  if (state.dead_econs.length>0) debugger;
-
   let total_bubbles_picked_up = state.econs.map(e => e.bubbles).reduce((sum, bubbles) => sum + bubbles, 0);
   total_bubbles_picked_up += state.dead_econs.map(e => e.bubbles).reduce((sum, bubbles) => sum + bubbles, 0);
   let fraction_dead = state.dead_econs.length / params.econ_starting_number;
