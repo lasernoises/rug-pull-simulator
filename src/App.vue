@@ -14,6 +14,9 @@ let activateMaxSpeed = ref(false);
 let cashOut = ref(false);
 let activateDebugBuild = ref(false);
 let isGameOver = ref(false);
+let validCheatCode = ref("DEBUG1234");
+let cheatCodeInput = ref("");
+let isCheatCodeValid = ref(false);
 
 const tutorialDone = ref<boolean>(localStorage.getItem("tutorialDone") !== null);
 const tutorialHighlighter = ref<Vec2|null>(null);
@@ -74,6 +77,10 @@ const handleCashOut = () => {
     window.alert(`Cashed out! You collected $${cashOutval}. Try again to beat your highscore of $${prevHighScore}!`);
   }
   reset();
+};
+
+const checkCheatCode =() => {
+      isCheatCodeValid.value = cheatCodeInput.value === validCheatCode.value;
 };
 
 const togglePause = () => {
@@ -375,10 +382,16 @@ const max_player_food = computed(() => {
         <button v-if="activateDebugBuild" type="button" @click="reset">Reset</button>
         <button type="button" @click="cashOut = true">Cash Out</button>
         <button v-if="tutorialDone" @click="ev => { tutorialDone = false; ev.stopPropagation(); }">Redo tutorial</button>
-        <button type="button" @click="toggleDebug">{{ activateDebugBuild ? 'Deactivate Debug' : 'Active Debug' }}</button>
-      </div>
-      <br>
-
+        <!-- Button is displayed only when cheat code is correct -->
+        <button 
+          v-if="isCheatCodeValid" 
+          type="button" 
+          @click="toggleDebug"
+        >
+          {{ activateDebugBuild ? 'Deactivate Debug' : 'Activate Debug' }}
+        </button>
+    </div>
+    <br>
       <!----------------- MARKETING ----------------->
 
       <hr>
@@ -528,7 +541,22 @@ const max_player_food = computed(() => {
         ></circle>
       </svg>
     </div>
-
+    <!-- Input field for entering the cheat code -->
+     <br>
+     <br>
+     <br>
+     <br>
+     <br>
+     <br>
+     <br>
+     <br>
+      <input 
+        v-if="!isCheatCodeValid"
+        type="text" 
+        v-model="cheatCodeInput" 
+        placeholder="Enter cheat code"
+        @input="checkCheatCode"
+      />
     </div>
   </div>
 </template>
