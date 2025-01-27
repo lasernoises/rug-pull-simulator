@@ -60,9 +60,9 @@ const handleCashOut = () => {
   let cashOutval = Math.round(state.value.player.food * 100) / 100;
   let prevHighScore = Math.round(state.value.highscore * 100) / 100;
   if (state.value.player.food > state.value.highscore) {
-    window.alert(`Cashed out! You collected ${cashOutval} food! This is a new highscore! (Previous highscore: ${prevHighScore})`);
+    window.alert(`Cashed out! You collected $${cashOutval}! This is a new highscore! (Previous highscore: $${prevHighScore})`);
   } else {
-    window.alert(`Cashed out! You collected ${cashOutval} food. Try again to beat your highscore of ${prevHighScore}!`);
+    window.alert(`Cashed out! You collected $${cashOutval}. Try again to beat your highscore of $${prevHighScore}!`);
   }
   reset();
 };
@@ -228,6 +228,13 @@ const max_player_food = computed(() => {
           r="16"
           fill="yellow"
         ></circle>
+
+        <text
+          :x="pos.x - 7"
+          :y="pos.y + 8"
+          fill="green"
+          style="font-size: 24px; font-family: monospace;"
+        >$</text>
       </template>
 
       <template
@@ -353,12 +360,11 @@ const max_player_food = computed(() => {
     <div style="flex-grow: 1; width: 100%; height: 100%">
       <br>
       <div style="display: flex; gap: 10px; margin-left: auto;">
-        <!---<button type="button" @click="speed = 0; isPaused=false">Default speed</button>--->
         <button type="button" @click=togglePause>{{ isPaused ? 'Unpause' : 'Pause' }}</button>
         <button type="button" @click=toggleMaxSpeed>{{ activateMaxSpeed ? 'Normal Speed' : 'Max Speed' }}</button>
         <button v-if="activateDebugBuild" type="button" @click="reset">Reset</button>
         <button type="button" @click="cashOut = true">Cash Out</button>
-        <!-- <button type="button" @click="toggleDebug">{{ activateDebugBuild ? 'Deactivate Debug' : 'Active Debug' }}</button> -->
+        <!---<button type="button" @click="toggleDebug">{{ activateDebugBuild ? 'Deactivate Debug' : 'Active Debug' }}</button>--->
         <button v-if="tutorialDone" @click="ev => { tutorialDone = false; ev.stopPropagation(); }">Redo tutorial</button>
       </div>
       <br>
@@ -368,7 +374,7 @@ const max_player_food = computed(() => {
       <hr>
       <h2>Marketing</h2>
       <div>Marketing Points: {{ state.player.marketing_points }}</div>
-      <div>Marketing Cost: -{{ state.playerFoodCostPerSecond }} Food / second</div>
+      <div>Marketing Cost: -${{ state.playerFoodCostPerSecond }} / second</div>
       <br>
       <button
         @click="state.player.marketing_points += params.marketing_point_increment"
@@ -382,7 +388,7 @@ const max_player_food = computed(() => {
         @click="placing = 'billboardFirstLeg'"
         id="marketingBillboardButton"
       >
-        Deploy Billboard ({{ params.billboard_price }} marketing points)
+        Deploy Billboard
       </button>
       
       <span style="margin-left: 6px;">(-{{ params.billboard_price }} Marketing Points)</span>
@@ -398,15 +404,15 @@ const max_player_food = computed(() => {
       >
         Hire Marketing Person
       </button>
-      <span style="margin-left: 6px;">(+1 Marketing Points / second, -{{ params.marketing_person_salary }} Food / second)</span>
+      <span style="margin-left: 6px;">(+1 Marketing Points / second, -${{ params.marketing_person_salary }} / second)</span>
       <br>
       <button
         :disabled="state.player.food <= params.influencer_salary"
         @click="place_influencer"
       >
-        Hire Influencer ({{ params.influencer_salary }} Food / second)
+        Hire Influencer
       </button>
-      <span style="margin-left: 6px;">(-{{ params.influencer_salary }} Food / second)</span>
+      <span style="margin-left: 6px;">(-${{ params.influencer_salary }} / second)</span>
       <br>
 
       <!----------------- ECONOMY ----------------->
@@ -422,7 +428,7 @@ const max_player_food = computed(() => {
         <button @click="rug_pull">Pull Rug</button>
       </div>
       <div style="margin-top: 0.5em">Bubble Stockpile: {{ state.player.bubbles }}</div>
-      <div style="margin-top: 0.5em;"><span id="foodScore">Player Food: {{ Math.round(state.player.food * 100) / 100 }} (Highscore: {{ Math.round(state.highscore * 100) / 100 }})</span></div>
+      <div style="margin-top: 0.5em;"><span id="foodScore">Player: ${{ Math.round(state.player.food * 100) / 100 }} (Highscore: ${{ Math.round(state.highscore * 100) / 100 }})</span></div>
       <svg
         v-if="state.player_food_history.length > -1"
         width="100%"
@@ -445,7 +451,7 @@ const max_player_food = computed(() => {
       <br>
       <hr>
       <h2>Price History</h2>
-      Current Bubble Price: {{ Math.round(state.avgValue * 100) / 100 }}
+      Current Bubble Price: ${{ Math.round(state.avgValue * 100) / 100 }}
       <span v-if="activateDebugBuild" style="margin-left: 6px;">
         (Deprecation factor: {{ Math.round(state.deprecationFactor * 100) / 100 }})
       </span>
@@ -479,6 +485,7 @@ const max_player_food = computed(() => {
       <br>
       <br>
 
+      <div v-if="false">
       <h3>Legend</h3>
 
       Bubble:
@@ -510,6 +517,7 @@ const max_player_food = computed(() => {
           fill="yellow"
         ></circle>
       </svg>
+    </div>
 
     </div>
   </div>

@@ -48,23 +48,23 @@ export const params = reactive({
   player_initial_bubbles: 512,
   market_trade_radius: 40,
   econ_starting_number: 32,
-  econ_initial_food: 30,
+  econ_initial_food: 300,
   econ_min_distance: 32,
   econ_velocity_change_chance: 0.01,
   econ_bubble_collection_radius: 32,
   econ_food_collection_radius: 64,
-  econ_food_consumption: 0.01,
-  food_value: 16,
+  econ_food_consumption: 0.05,
+  food_value: 80,
   bubbles_bulk_place_amount: 10,
   billboard_influence_radius: 128,
-  billboard_influence_strength: 0.001,
+  billboard_influence_strength: 0.01,
   billboard_length: 50,
   billboard_price: 20,
   marketing_point_increment: 1,
-  marketing_person_salary: 0.2,
-  influencer_salary: 2,
+  marketing_person_salary: 2,
+  influencer_salary: 20,
   influencer_influence_radius: 128,
-  influencer_influence_strength: 0.02,
+  influencer_influence_strength: 0.04,
 });
 
 type CashPopup = {
@@ -351,9 +351,12 @@ export function tick(state: State): boolean {
     // }
   }
 
+  if (state.dead_econs.length>0) debugger;
+
   let total_bubbles_picked_up = state.econs.map(e => e.bubbles).reduce((sum, bubbles) => sum + bubbles, 0);
   total_bubbles_picked_up += state.dead_econs.map(e => e.bubbles).reduce((sum, bubbles) => sum + bubbles, 0);
-  state.deprecationFactor = 1 - (total_bubbles_picked_up / params.player_initial_bubbles);
+  let fraction_dead = state.dead_econs.length / params.econ_starting_number;
+  state.deprecationFactor = 1 - Math.max(total_bubbles_picked_up / params.player_initial_bubbles, fraction_dead);
 
   state.playerFoodCostPerSecond = state.player.marketing_people * params.marketing_person_salary + state.influencers.length * params.influencer_salary;
 
