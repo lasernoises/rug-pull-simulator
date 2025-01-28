@@ -54,7 +54,7 @@ export const params = reactive({
   econ_velocity_change_chance: 0.01,
   econ_bubble_collection_radius: 32,
   econ_food_collection_radius: 64,
-  econ_food_consumption: 0.05,
+  econ_food_consumption: 0.06,
   food_value: 80,
   bubbles_bulk_place_amount: 10,
   billboard_influence_radius: 128,
@@ -88,6 +88,8 @@ export type State = {
   price_history: number[],
   player_food_history: number[],
   avgValue: number, // avg bubble value
+  totalEconCash: number,
+  avgEconCash: number,
   deprecationFactor: number,
   highscore: number,
   playerFoodCostPerSecond: number,
@@ -128,6 +130,7 @@ export function init(): State {
       )),
     dead_econs: [],
     avgValue: 0,
+    avgEconCash: 0,
     deprecationFactor: 1,
     highscore,
     playerFoodCostPerSecond: 0,
@@ -352,7 +355,10 @@ export function tick(state: State): boolean {
     // if (state.price_history.length > 64) {
     //   state.price_history.splice(0, 1);
     // }
+    state.totalEconCash = state.econs.map(e => e.food).reduce((a, b) => a + b, 0);
+    state.avgEconCash = state.totalEconCash / state.econs.length;
   }
+
 
   let total_bubbles_picked_up = state.econs.map(e => e.bubbles).reduce((sum, bubbles) => sum + bubbles, 0);
   total_bubbles_picked_up += state.dead_econs.map(e => e.bubbles).reduce((sum, bubbles) => sum + bubbles, 0);
@@ -364,7 +370,6 @@ export function tick(state: State): boolean {
   if (state.ticks % 60 === 0) {
     state.player.food -= state.player.marketing_people * state.player.marketing_people * params.marketing_person_salary;
     state.player.marketing_points += state.player.marketing_people;
-
     state.player.food -= state.influencers.length * params.influencer_salary;
   }
 

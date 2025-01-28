@@ -465,7 +465,7 @@ const max_player_food = computed(() => {
         <br>
       </div>
       <div style="margin-top: 0.5em">Bubble Stockpile: {{ state.player.bubbles }}</div>
-      <div style="margin-top: 0.5em;"><span id="foodScore">Player: ${{ Math.round(state.player.food * 100) / 100 }} (Highscore: ${{ Math.round(state.highscore * 100) / 100 }})</span></div>
+      <div style="margin-top: 0.5em;"><span id="foodScore">Liquidity: ${{ Math.round(state.player.food * 100) / 100 }} (Highscore: ${{ Math.round(state.highscore * 100) / 100 }})</span></div>
       <svg
         v-if="state.player_food_history.length > -1"
         width="100%"
@@ -488,7 +488,7 @@ const max_player_food = computed(() => {
       <br>
       <hr>
       <h2>Price History</h2>
-      Current Bubble Price: ${{ Math.round(state.avgValue * 100) / 100 }}
+      Current Bubble Price: ${{ Math.round(state.price_history.slice(-1)[0] * 100) / 100 }} (Max: ${{ Math.round(max_price * 100) / 100 }})
       <span v-if="activateDebugBuild" style="margin-left: 6px;">
         (Deprecation factor: {{ Math.round(state.deprecationFactor * 100) / 100 }})
       </span>
@@ -520,7 +520,13 @@ const max_player_food = computed(() => {
         <input type="number" v-model="params[name]"/>
       </template>
       <br>
+      <hr>
+      <h2>Global Economy</h2>
+      Total Cash: ${{Math.round(state.totalEconCash * 100) / 100}}
       <br>
+      Average Cash: ${{Math.round(state.avgEconCash * 100) / 100}}
+      <br>
+      Alive: {{state.econs.length}} / {{state.econs.length + state.dead_econs.length}}
 
       <div v-if="false">
       <h3>Legend</h3>
