@@ -17,6 +17,7 @@ let isGameOver = ref(false);
 let validCheatCode = ref("DEBUG1234");
 let cheatCodeInput = ref("");
 let isCheatCodeValid = ref(false);
+let selectedSvg = ref("BubblePrice");
 
 const tutorialDone = ref<boolean>(localStorage.getItem("tutorialDone") !== null);
 const tutorialHighlighter = ref<Vec2|null>(null);
@@ -79,7 +80,7 @@ const handleCashOut = () => {
   reset();
 };
 
-const checkCheatCode =() => {
+const checkCheatCode = () => {
       isCheatCodeValid.value = cheatCodeInput.value === validCheatCode.value;
 };
 
@@ -219,6 +220,21 @@ const max_price = computed(() => {
 const max_player_food = computed(() => {
   return Math.max(0, ...state.value.player_food_history);
 });
+
+const max_global_cash = computed(() => {
+  return Math.max(0, ...state.value.global_cash_history);
+});
+
+const printNumber = (number: number) => {
+  return (Math.round(number * 100) / 100).toFixed(1)
+}
+
+const calculateTrend = (numberArray: number[], length: number) => {
+  if (numberArray.length < length) {
+    return 0;
+  }
+  return (numberArray.slice(-1)[0] - numberArray.slice(-length)[0]) / (length-1);
+}
 
 </script>
 
@@ -465,7 +481,13 @@ const max_player_food = computed(() => {
         <br>
       </div>
       <div style="margin-top: 0.5em">Bubble Stockpile: {{ state.player.bubbles }}</div>
-      <div style="margin-top: 0.5em;"><span id="foodScore">Liquidity: ${{ Math.round(state.player.food * 100) / 100 }} (Highscore: ${{ Math.round(state.highscore * 100) / 100 }})</span></div>
+
+      <div class="grid-container">
+          <span style="font-family: monospace;">Liquidity: ${{ printNumber(state.player.food) }} </span>
+          <span style="font-family: monospace;">Highscore: ${{printNumber(state.highscore) }}</span>
+          <span style="font-family: monospace;">Trend: ${{printNumber(calculateTrend(state.player_food_history, 7)) }}</span>
+      </div>
+
       <svg
         v-if="state.player_food_history.length > -1"
         width="100%"
@@ -487,17 +509,48 @@ const max_player_food = computed(() => {
 
       <br>
       <hr>
-      <h2>Price History</h2>
-      Current Bubble Price: ${{ Math.round(state.price_history.slice(-1)[0] * 100) / 100 }} (Max: ${{ Math.round(max_price * 100) / 100 }})
-      <span v-if="activateDebugBuild" style="margin-left: 6px;">
-        (Deprecation factor: {{ Math.round(state.deprecationFactor * 100) / 100 }})
-      </span>
+      <h2>Global Economy</h2>
+
+      <span style="font-family: monospace;">Alive: {{state.econs.length}} / {{state.econs.length + state.dead_econs.length}}</span> 
       <br>
-      <!-- <br> -->
-      <!-- Last Trade: {{ state.last_trade }} -->
+      <span v-if="activateDebugBuild" style="margin-left: 6px;">(Bubble Deprecation factor: {{ printNumber(state.deprecationFactor)}})</span>
+
+
+      <div>
+        <!-- Radio Buttons -->
+        <div class="grid-container">
+
+          <label>
+            <input type="radio" v-model="selectedSvg" value="BubblePrice" /> <span style="font-family: monospace;">Bubble Price:</span> <span class="fixed-width">${{printNumber(state.price_history.slice(-1)[0])}}</span>
+          </label>
+
+          <div>
+            <span style="font-family: monospace;">Max:&nbsp;&nbsp;&nbsp;&nbsp;</span> <span class="fixed-width">${{ printNumber(max_price) }}</span>
+          </div>
+
+          <div>
+            <span style="font-family: monospace;">Trend:</span> <span class="fixed-width">${{ printNumber(calculateTrend(state.price_history, 7)) }}</span> / second
+          </div>
+
+          <label>
+            <input type="radio" v-model="selectedSvg" value="GlobalCash" /> <span style="font-family: monospace;">Total Cash:&nbsp;&nbsp;</span>  <span class="fixed-width">${{printNumber(state.totalEconCash)}}</span>
+          </label>
+
+          <div>
+            <span style="font-family: monospace;">Average:</span> <span class="fixed-width">${{printNumber(state.avgEconCash)}}</span>
+          </div>
+
+          <div>
+            <span style="font-family: monospace;">Trend:</span> <span class="fixed-width">${{ printNumber(calculateTrend(state.global_cash_history, 7)) }}</span> / second
+          </div>
+
+        </div>
+      </div>
+
+      <br>
       <br>
       <svg
-        v-if="state.price_history.length > -1"
+        v-if="selectedSvg == 'BubblePrice' && state.price_history.length > -1"
         width="100%"
         height="128"
         preserveAspectRatio="none"
@@ -513,6 +566,25 @@ const max_player_food = computed(() => {
           fill="white"
         ></polygon>
       </svg>
+
+      <svg
+        v-if="selectedSvg == 'GlobalCash' && state.global_cash_history.length > -1"
+        width="100%"
+        height="128"
+        preserveAspectRatio="none"
+        viewBox="0 0 256 128"
+      >
+        <polygon
+          :points="
+            '256,128 0,128 '
+              + state.global_cash_history
+                  .map((p, i) => `${256 / (state.global_cash_history.length - 1) * i},${128 - p / max_global_cash * 128}` )
+                  .join(' ')
+          "
+          fill="white"
+        ></polygon>
+      </svg>
+
       <br>
       <template v-if="activateDebugBuild" v-for="param, name in params">
         <br>
@@ -521,12 +593,6 @@ const max_player_food = computed(() => {
       </template>
       <br>
       <hr>
-      <h2>Global Economy</h2>
-      Total Cash: ${{Math.round(state.totalEconCash * 100) / 100}}
-      <br>
-      Average Cash: ${{Math.round(state.avgEconCash * 100) / 100}}
-      <br>
-      Alive: {{state.econs.length}} / {{state.econs.length + state.dead_econs.length}}
 
       <div v-if="false">
       <h3>Legend</h3>
@@ -587,6 +653,19 @@ const max_player_food = computed(() => {
     animation-duration: 2s;
     animation-timing-function: ease-in;
     animation-iteration-count: infinite;
+  }
+
+  .fixed-width {
+    display: inline-block;
+    width: 80px;
+    text-align: right;
+    font-family: monospace;
+  }
+
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    gap: 10px;
   }
 
   @keyframes blink-border {

@@ -54,11 +54,11 @@ export const params = reactive({
   econ_velocity_change_chance: 0.01,
   econ_bubble_collection_radius: 32,
   econ_food_collection_radius: 64,
-  econ_food_consumption: 0.06,
-  food_value: 80,
+  econ_food_consumption: 0.08,
+  food_value: 128,
   bubbles_bulk_place_amount: 10,
   billboard_influence_radius: 128,
-  billboard_influence_strength: 0.01,
+  billboard_influence_strength: 0.005,
   billboard_length: 50,
   billboard_price: 20,
   marketing_point_increment: 1,
@@ -87,6 +87,7 @@ export type State = {
   last_trade: { amount: number, price: number } | null,
   price_history: number[],
   player_food_history: number[],
+  global_cash_history: number[],
   avgValue: number, // avg bubble value
   totalEconCash: number,
   avgEconCash: number,
@@ -119,6 +120,7 @@ export function init(): State {
     last_trade: null,
     price_history: [],
     player_food_history: [],
+    global_cash_history: [],
     econs:
       n_random_pos_no_collisions(params.econ_starting_number, params.econ_min_distance).map(pos => econ(
       // [...Array(Math.round(Math.random() * 32)).keys()].map(() => econ(
@@ -129,6 +131,7 @@ export function init(): State {
         },
       )),
     dead_econs: [],
+    totalEconCash: 0,
     avgValue: 0,
     avgEconCash: 0,
     deprecationFactor: 1,
@@ -357,6 +360,7 @@ export function tick(state: State): boolean {
     // }
     state.totalEconCash = state.econs.map(e => e.food).reduce((a, b) => a + b, 0);
     state.avgEconCash = state.totalEconCash / state.econs.length;
+    state.global_cash_history.push(state.totalEconCash);
   }
 
 
