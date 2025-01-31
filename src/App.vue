@@ -271,7 +271,8 @@ const globalCashTrend = computed(() => {
           :cx="pos.x"
           :cy="pos.y"
           r="16"
-          fill="yellow"
+          fill="LightGreen"
+          stroke="green"
         ></circle>
 
         <text
@@ -425,7 +426,7 @@ const globalCashTrend = computed(() => {
       <hr>
       <h2>Marketing</h2>
       <div>Marketing Points: {{ state.player.marketing_points }}</div>
-      <div>Marketing Cost: -${{ state.playerFoodCostPerSecond }} / second</div>
+      <div>Marketing Cost: <span :style="{ color: state.playerFoodCostPerSecond == 0 ? 'green' : 'red' }">-${{ state.playerFoodCostPerSecond }}</span> / second</div>
       <br>
       <button
         @click="state.player.marketing_points += params.marketing_point_increment"
@@ -520,7 +521,7 @@ const globalCashTrend = computed(() => {
                   .map((p, i) => `${256 / (state.player_food_history.length - 1) * i},${128 - p / max_player_food * 128}` )
                   .join(' ')
           "
-          fill="white"
+          fill="LightGreen"
         ></polygon>
       </svg>
 
@@ -581,7 +582,7 @@ const globalCashTrend = computed(() => {
                   .map((p, i) => `${256 / (state.price_history.length - 1) * i},${128 - p / max_price * 128}` )
                   .join(' ')
           "
-          fill="white"
+          fill="#a0bff1"
         ></polygon>
       </svg>
 
@@ -599,7 +600,7 @@ const globalCashTrend = computed(() => {
                   .map((p, i) => `${256 / (state.global_cash_history.length - 1) * i},${128 - p / max_global_cash * 128}` )
                   .join(' ')
           "
-          fill="white"
+          fill="LightGreen"
         ></polygon>
       </svg>
 
@@ -611,40 +612,6 @@ const globalCashTrend = computed(() => {
       </template>
       <br>
       <hr>
-
-      <div v-if="false">
-      <h3>Legend</h3>
-
-      Bubble:
-
-      <svg width="32"
-        height="32"
-        preserveAspectRatio="none"
-        viewBox="-20 -20 36 36">
-        <circle
-          :cx="0"
-          :cy="0"
-          r="14"
-          fill="#90a0ff70"
-          stroke="blue"
-          stroke-width="2"
-        ></circle>
-      </svg>
-
-      Food:
-
-      <svg width="32"
-        height="32"
-        preserveAspectRatio="none"
-        viewBox="-20 -20 36 36">
-        <circle
-          :cx="0"
-          :cy="0"
-          r="14"
-          fill="yellow"
-        ></circle>
-      </svg>
-    </div>
      <br>
      <br>
      <br>
