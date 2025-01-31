@@ -236,6 +236,18 @@ const calculateTrend = (numberArray: number[], length: number) => {
   return (numberArray.slice(-1)[0] - numberArray.slice(-length)[0]) / (length-1);
 }
 
+const playerCashTrend = computed(() => {
+  return calculateTrend(state.value.player_food_history, 7);
+});
+
+const bubbleTrend = computed(() => {
+  return calculateTrend(state.value.price_history, 7);
+});
+
+const globalCashTrend = computed(() => {
+  return calculateTrend(state.value.global_cash_history, 7);
+});
+
 </script>
 
 <template>
@@ -480,12 +492,18 @@ const calculateTrend = (numberArray: number[], length: number) => {
         </button>
         <br>
       </div>
-      <div style="margin-top: 0.5em">Bubble Stockpile: {{ state.player.bubbles }}</div>
+      <div style="margin-top: 0.5em"><span style="font-family: monospace;">Bubble Stockpile: {{ state.player.bubbles }}</span></div>
 
       <div class="grid-container">
-          <span style="font-family: monospace;">Liquidity: ${{ printNumber(state.player.food) }} </span>
-          <span style="font-family: monospace;">Highscore: ${{printNumber(state.highscore) }}</span>
-          <span style="font-family: monospace;">Trend: ${{printNumber(calculateTrend(state.player_food_history, 7)) }}</span>
+        <div>
+          <span style="font-family: monospace;">Liquidity:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> <span class="fixed-width">${{ printNumber(state.player.food) }} </span>
+        </div>
+        <div>
+          <span style="font-family: monospace;">Highscore:</span> <span class="fixed-width">${{printNumber(state.highscore) }}</span>
+        </div>  
+          <div>
+            <span style="font-family: monospace;">Trend:</span> <span class="fixed-width" :style="{ color: playerCashTrend >= 0 ? 'green' : 'red' }">${{printNumber(playerCashTrend) }}</span>  / second
+          </div>  
       </div>
 
       <svg
@@ -525,11 +543,11 @@ const calculateTrend = (numberArray: number[], length: number) => {
           </label>
 
           <div>
-            <span style="font-family: monospace;">Max:&nbsp;&nbsp;&nbsp;&nbsp;</span> <span class="fixed-width">${{ printNumber(max_price) }}</span>
+            <span style="font-family: monospace;">Max:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> <span class="fixed-width">${{ printNumber(max_price) }}</span>
           </div>
 
           <div>
-            <span style="font-family: monospace;">Trend:</span> <span class="fixed-width">${{ printNumber(calculateTrend(state.price_history, 7)) }}</span> / second
+            <span style="font-family: monospace;">Trend:</span> <span class="fixed-width" :style="{ color: bubbleTrend >= 0 ? 'green' : 'red' }">${{ printNumber(bubbleTrend) }}</span> / second
           </div>
 
           <label>
@@ -537,11 +555,11 @@ const calculateTrend = (numberArray: number[], length: number) => {
           </label>
 
           <div>
-            <span style="font-family: monospace;">Average:</span> <span class="fixed-width">${{printNumber(state.avgEconCash)}}</span>
+            <span style="font-family: monospace;">Average:&nbsp;&nbsp;</span> <span class="fixed-width">${{printNumber(state.avgEconCash)}}</span>
           </div>
 
           <div>
-            <span style="font-family: monospace;">Trend:</span> <span class="fixed-width">${{ printNumber(calculateTrend(state.global_cash_history, 7)) }}</span> / second
+            <span style="font-family: monospace;">Trend:</span> <span class="fixed-width" :style="{ color: globalCashTrend >= 0 ? 'green' : 'red' }">${{ printNumber(globalCashTrend) }}</span> / second
           </div>
 
         </div>
