@@ -403,91 +403,138 @@ const globalCashTrend = computed(() => {
       ></circle>
 
     </svg>
+
+    <!----------------- MENU ----------------->
+
     <div style="flex-grow: 1; width: 100%; height: 100%">
-      <br>
-      <div style="display: flex; gap: 10px; margin-left: auto;">
-        <button type="button" @click=togglePause>{{ isPaused ? 'Unpause' : 'Pause' }}</button>
-        <button type="button" @click=toggleMaxSpeed>{{ activateMaxSpeed ? 'Normal Speed' : 'Max Speed' }}</button>
-        <button v-if="activateDebugBuild" type="button" @click="reset">Reset</button>
-        <button type="button" @click="cashOut = true">Cash Out</button>
-        <button v-if="tutorialDone" @click="ev => { tutorialDone = false; ev.stopPropagation(); }">Redo tutorial</button>
-        <!-- Button is displayed only when cheat code is correct -->
-        <button 
-          v-if="isCheatCodeValid" 
-          type="button" 
-          @click="toggleDebug"
-        >
-          {{ activateDebugBuild ? 'Deactivate Debug' : 'Activate Debug' }}
-        </button>
-    </div>
-    <br>
+
+      <div class="container mt-4">
+          <!-- Grid Row for Buttons -->
+          <div class="row text-center">
+            
+            <div class="col">
+              <button class="btn btn-primary" type="button" @click=togglePause>{{ isPaused ? 'Unpause' : 'Pause' }}</button>
+            </div> 
+
+            <div class="col">
+              <button class="btn btn-primary" type="button" @click=toggleMaxSpeed>{{ activateMaxSpeed ? 'Normal Speed' : 'Max Speed' }}</button>
+            </div>  
+
+            <div class="col">
+              <button class="btn btn-primary" type="button" @click="cashOut = true">Cash Out</button>
+            </div>
+
+            <div class="col">
+              <button class="btn btn-primary" v-if="tutorialDone" @click="ev => { tutorialDone = false; ev.stopPropagation(); }">Redo tutorial</button>
+            </div>
+        </div>
+
+          <!-- Grid Row for shortcuts -->
+        <div class="row text-center  mt-2">
+          <div class="col">
+            <span>Space</span>
+          </div>
+          <div class="col">
+            <span>Shift</span>
+          </div>
+          <div class="col">
+            <span>C</span>
+          </div>
+          <div class="col"></div>
+        </div>
+      </div>
+
       <!----------------- MARKETING ----------------->
 
       <hr>
-      <h2>Marketing</h2>
-      <div>Marketing Points: {{ state.player.marketing_points }}</div>
-      <div>Marketing Cost: <span :style="{ color: state.playerFoodCostPerSecond == 0 ? 'green' : 'red' }">-${{ state.playerFoodCostPerSecond }}</span> / second</div>
+      <h4>Marketing</h4>
+      <div>Marketing Points: {{ state.player.marketing_points }} MP</div>
+      <div>Marketing Cost: <span :style="{ color: state.playerFoodCostPerSecond == 0 ? 'LightGreen' : 'red' }">-${{ state.playerFoodCostPerSecond }}</span> / second</div>
       <br>
-      <button
-        @click="state.player.marketing_points += params.marketing_point_increment"
-        :disabled="isPaused"
-        id="marketingFirstButton"
-      >Brainstorm</button>
-      <span style="margin-left: 6px;">(+1 Marketing Points)</span>
-      <br>
+
+      <div class="container mt-4">
+        <!-- Grid Row for Buttons -->
+        <div class="row text-center">
+          <div class="col">
+            <button class="btn btn-primary"
+            @click="state.player.marketing_points += params.marketing_point_increment"
+            :disabled="isPaused"
+            id="marketingFirstButton"
+          >Brainstorm</button>
+          </div>
+          <div class="col">
+            <button class="btn btn-primary"
+            :disabled="state.player.marketing_points < params.billboard_price"
+            @click="placing = 'billboardFirstLeg'"
+            id="marketingBillboardButton"
+          >
+            Deploy Billboard
+          </button>
+          </div>
+          <div class="col">
+            <button class="btn btn-primary"
+          :disabled="state.player.food <= 2 * state.player.marketing_people * params.marketing_person_salary + params.marketing_person_salary"
+            @click="state.player.marketing_people += 1"
+          >
+            Hire Marketing Person
+          </button>
+          </div>
+          <div class="col">
+            <button class="btn btn-primary"
+            :disabled="state.player.food <= params.influencer_salary"
+            @click="place_influencer"
+          >
+            Hire Influencer
+          </button>
+          </div>
+        </div>
+
+        <!-- Grid Row for Text -->
+        <div class="row text-center mt-2">
+          <div class="col">
+            <span style="margin-left: 6px;">+1 MP</span>
+          </div>
+          <div class="col">
+            <p>
+              <span style="margin-left: 6px;">-{{ params.billboard_price }} MP</span>
+              <template v-if="state.player.marketing_people">
+                <br>
+                Marketing People: {{ state.player.marketing_people }}
+              </template>
+            </p>
+          </div>
+          <div class="col">
+            <span style="margin-left: 6px;">+1 MP / second<br> -${{ 2 * state.player.marketing_people * params.marketing_person_salary + params.marketing_person_salary }} / second</span>
+          </div>
+          <div class="col">
+            <span style="margin-left: 6px;">-${{ params.influencer_salary }} / second</span>
+          </div>
+        </div>
+      </div>
+
       <div v-if="activateDebugBuild">
-        <button
+        <button class="btn btn-primary"
             @click="state.player.marketing_points += 100"
           >+100 Marketing Points
         </button>
         <br>
       </div>
-      <button
-        :disabled="state.player.marketing_points < params.billboard_price"
-        @click="placing = 'billboardFirstLeg'"
-        id="marketingBillboardButton"
-      >
-        Deploy Billboard
-      </button>
-      
-      <span style="margin-left: 6px;">(-{{ params.billboard_price }} Marketing Points)</span>
-      
-      <template v-if="state.player.marketing_people">
-        <br>
-        Marketing People: {{ state.player.marketing_people }}
-      </template>
-      <br>
-      <button
-      :disabled="state.player.food <= 2 * state.player.marketing_people * params.marketing_person_salary + params.marketing_person_salary"
-        @click="state.player.marketing_people += 1"
-      >
-        Hire Marketing Person
-      </button>
-      <span style="margin-left: 6px;">(+1 Marketing Points / second, -${{ 2 * state.player.marketing_people * params.marketing_person_salary + params.marketing_person_salary }} / second)</span>
-      <br>
-      <button
-        :disabled="state.player.food <= params.influencer_salary"
-        @click="place_influencer"
-      >
-        Hire Influencer
-      </button>
-      <span style="margin-left: 6px;">(-${{ params.influencer_salary }} / second)</span>
-      <br>
 
       <!----------------- ECONOMY ----------------->
+
       <br>
       <hr>
-      <h2>Player Economy</h2>
+      <h4>Player Economy</h4>
       <div style="display: flex; gap: 10px; margin-left: auto; margin-top: 0.5em;">
-        <button 
+        <button class="btn btn-primary" 
           id="placeBubblesButton"
           @click="placing === 'bubbles' ? placing = null : placing = 'bubbles'"
         >Place Bubbles</button>
-        <button @click="bulk_place_bubbles">Mass Place Bubbles</button>
-        <button @click="rug_pull">Pull Rug</button>
+        <button class="btn btn-primary" @click="bulk_place_bubbles">Mass Place Bubbles</button>
+        <button class="btn btn-primary" @click="rug_pull">Pull Rug</button>
       </div>
       <div v-if="activateDebugBuild">
-        <button
+        <button class="btn btn-primary"
             @click="state.player.food += 1000"
           >+$1000
         </button>
@@ -503,7 +550,7 @@ const globalCashTrend = computed(() => {
           <span style="font-family: monospace;">Highscore:</span> <span class="fixed-width">${{printNumber(state.highscore) }}</span>
         </div>  
           <div>
-            <span style="font-family: monospace;">Trend:</span> <span class="fixed-width" :style="{ color: playerCashTrend >= 0 ? 'green' : 'red' }">${{printNumber(playerCashTrend) }}</span>  / second
+            <span style="font-family: monospace;">Trend:</span> <span class="fixed-width" :style="{ color: playerCashTrend >= 0 ? 'LightGreen' : 'red' }">${{printNumber(playerCashTrend) }}</span>  / second
           </div>  
       </div>
 
@@ -528,7 +575,7 @@ const globalCashTrend = computed(() => {
 
       <br>
       <hr>
-      <h2>Global Economy</h2>
+      <h4>Global Economy</h4>
 
       <span style="font-family: monospace;">Alive: {{state.econs.length}} / {{state.econs.length + state.dead_econs.length}}</span> 
       <br>
@@ -548,7 +595,7 @@ const globalCashTrend = computed(() => {
           </div>
 
           <div>
-            <span style="font-family: monospace;">Trend:</span> <span class="fixed-width" :style="{ color: bubbleTrend >= 0 ? 'green' : 'red' }">${{ printNumber(bubbleTrend) }}</span> / second
+            <span style="font-family: monospace;">Trend:</span> <span class="fixed-width" :style="{ color: bubbleTrend >= 0 ? 'LightGreen' : 'red' }">${{ printNumber(bubbleTrend) }}</span> / second
           </div>
 
           <label>
@@ -560,7 +607,7 @@ const globalCashTrend = computed(() => {
           </div>
 
           <div>
-            <span style="font-family: monospace;">Trend:</span> <span class="fixed-width" :style="{ color: globalCashTrend >= 0 ? 'green' : 'red' }">${{ printNumber(globalCashTrend) }}</span> / second
+            <span style="font-family: monospace;">Trend:</span> <span class="fixed-width" :style="{ color: globalCashTrend >= 0 ? 'LightGreen' : 'red' }">${{ printNumber(globalCashTrend) }}</span> / second
           </div>
 
         </div>
@@ -628,6 +675,22 @@ const globalCashTrend = computed(() => {
         placeholder="Enter cheat code"
         @input="checkCheatCode"
       />
+
+      <div class="col">
+              <!-- Button is displayed only when cheat code is correct -->
+              <button class="btn btn-primary" 
+                v-if="isCheatCodeValid" 
+                type="button" 
+                @click="toggleDebug"
+              >
+                {{ activateDebugBuild ? 'Deactivate Debug' : 'Activate Debug' }}
+              </button>
+            </div>
+
+      <div class="col">
+        <button class="btn btn-primary" v-if="activateDebugBuild" type="button" @click="reset">Reset</button>
+      </div>
+
     </div>
   </div>
 </template>
