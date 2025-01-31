@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, computed, ref, watch, shallowRef, triggerRef } from "vue";
+import { onMounted, onUnmounted, computed, ref, watch, shallowRef, triggerRef } from "vue";
 import { dbg, init, tick, econ, random_pos, params } from "./state.ts";
 import { scale, normalize, sub, add, type Vec2 } from "./vector-algebra.ts";
 import Grave from './Grave.vue';
@@ -50,6 +50,25 @@ const update = () => {
   }
   triggerRef(state);
   requestAnimationFrame(update);
+};
+
+
+// Function to handle key press
+const handleKeyPress = (event: KeyboardEvent) => {
+  switch (event.code) {
+    case "Space":
+      event.preventDefault(); // Prevent scrolling
+      togglePause();
+      break;
+    case "ShiftLeft":
+      event.preventDefault(); // Prevent scrolling
+      toggleMaxSpeed();
+      break;
+    case "KeyC":
+      event.preventDefault(); // Prevent scrolling
+      cashOut.value = true;
+      break;
+  }
 };
 
 const handleGameOver = (alive: boolean) => {
@@ -127,10 +146,15 @@ watch(svgElement, function (svgElement) {
 const mousePos = ref<Vec2 | null>(null);//{x: 0, y: 0};
 
 onMounted(() => {
+  window.addEventListener("keydown", handleKeyPress);
   update();
   if(!tutorialDone.value) {
     setTimeout(() => { doTutorial(isPaused, state, tutorialHighlighter, placing).then(() => { tutorialDone.value = true; }); }, 1000);
   }
+});
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", handleKeyPress);
 });
 
 const placing = ref<"bubbles" | "billboardFirstLeg" | "billboardSecondLeg" | null>(null);
