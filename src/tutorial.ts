@@ -16,7 +16,7 @@ export async function doTutorial(
     placing: Ref<"bubbles" | "billboardFirstLeg" | "billboardSecondLeg" | null>,
 ) {
     alert("Welcome to the Rug Pull Simulator. The goal of this game is to create market bubbles for fun and profit." +
-    " The profit is measured in Food and is shown on the right side of the screen, on the highlighted element.\n" +
+    " The profit is shown on the right side of the screen, on the highlighted element.\n" +
     "\n" +
     "Close this notification, then click anywhere to continue the tutorial.");
     document.getElementById("foodScore")?.classList.add("tutorial-highlight");
@@ -47,7 +47,7 @@ export async function doTutorial(
     alert("You can now place a marketing billboard. We advise you to place it near this person.\n" +
         "\n" +
         "This is the richest person on the board and they can afford a lot of bubbles.\n" +
-        "Wealth increases by collecting food (the yellow dots on the map). It decreases over time, as people need to eat.\n" +
+        "Wealth increases by collecting $. It decreases over time, as people need to pay bills.\n" +
         "A person's wealth is indicated by the red pie chart. Very poor people are almost completely red and might die soon."
     )
     for(let i of ['billboardFirstLeg', 'billboardSecondLeg']) {
@@ -74,7 +74,7 @@ export async function doTutorial(
     });
 
     alert(
-        "This is how the game works. Try to make as much money as possible - your " + Math.round(state.value.player.food * 100) / 100 + "$ are a good start!\n" +
+        "This is how the game works. Try to make as much money as possible - your $" + Math.round(state.value.player.food * 100) / 100 + " are a good start!\n" +
         "Here are other things you can do:\n" +
         "  - Improve the bubble price by improving marketing.\n" +
         "  - Place bubbles to make profit. However, more bubbles in the markets will drive the price down.\n" +

@@ -14,7 +14,7 @@ let activateMaxSpeed = ref(false);
 let cashOut = ref(false);
 let activateDebugBuild = ref(false);
 let isGameOver = ref(false);
-let validCheatCode = ref("DEBUG1234");
+let validCheatCode = ref("123454321"); // TO DO: deactivate shortcuts while entering cheat code; for now, cheat code should not contain any shortcuts
 let cheatCodeInput = ref("");
 let isCheatCodeValid = ref(false);
 let selectedSvg = ref("BubblePrice");
@@ -67,6 +67,15 @@ const handleKeyPress = (event: KeyboardEvent) => {
     case "KeyC":
       event.preventDefault(); // Prevent scrolling
       cashOut.value = true;
+      break;
+    case "KeyB":
+      event.preventDefault(); // Prevent scrolling
+      placing.value = "billboardFirstLeg";
+      break;
+    case "KeyR":
+      event.preventDefault(); // Prevent scrolling
+      tutorialDone.value = false
+      event.stopPropagation();
       break;
   }
 };
@@ -169,8 +178,8 @@ const marketingDevices = computed(() => ({
   influencer: state.value.player.marketing_points >= 50,
 }));
 
-const bulk_place_bubbles = () => {
-  for (let i = 0; i < params.bubbles_bulk_place_amount; i++) {
+const bulk_place_bubbles = (amount: number) => {
+  for (let i = 0; i < amount; i++) {
     if (state.value.player.bubbles === 0) {
       return;
     }
@@ -289,6 +298,15 @@ const globalCashTrend = computed(() => {
       ></circle>
 
       <template
+        v-for="econ in state.dead_econs"
+      >
+        <Grave
+          :cx="econ.pos.x"
+          :cy="econ.pos.y"
+        ></Grave>
+      </template>
+
+      <template
         v-for="pos in state.food"
       >
         <circle
@@ -318,15 +336,6 @@ const globalCashTrend = computed(() => {
           stroke="blue"
           stroke-width="2"
         ></circle>
-      </template>
-
-      <template
-        v-for="econ in state.dead_econs"
-      >
-        <Grave
-          :cx="econ.pos.x"
-          :cy="econ.pos.y"
-        ></Grave>
       </template>
 
       <template
@@ -379,6 +388,7 @@ const globalCashTrend = computed(() => {
         <text
           :x="popup.pos.x"
           :y="popup.pos.y"
+          fill="green"
           :fill-opacity="`${popup.remaining_time / 60}`">${{ Math.round(popup.value * 100) / 100 }}
         </text>
       </template>
@@ -456,25 +466,25 @@ const globalCashTrend = computed(() => {
           <!-- Grid Row for shortcuts -->
         <div class="row text-center  mt-2">
           <div class="col">
-            <span>Space</span>
+            Space
           </div>
           <div class="col">
-            <span>Shift</span>
+            Shift
           </div>
           <div class="col">
-            <span>C</span>
+            C
           </div>
-          <div class="col"></div>
+          <div class="col">
+            <div v-if="tutorialDone" >R</div>
+          </div>
         </div>
       </div>
 
       <!----------------- MARKETING ----------------->
 
       <hr>
-      <h4>Marketing</h4>
-      <div>Marketing Points: {{ state.player.marketing_points }} MP</div>
-      <div>Marketing Cost: <span :style="{ color: state.playerFoodCostPerSecond == 0 ? 'LightGreen' : 'red' }">-${{ state.playerFoodCostPerSecond }}</span> / second</div>
-      <br>
+      <h4>Marketing Points: {{ state.player.marketing_points }} MP</h4>
+      <div>Marketing Cost: <span :style="{ color: state.playerFoodCostPerSecond == 0 ? 'LightGreen' : 'red' }"><span v-if="state.playerFoodCostPerSecond > 0">-</span>${{ state.playerFoodCostPerSecond }}</span> / second</div>
 
       <div class="container mt-4">
         <!-- Grid Row for Buttons -->
@@ -500,7 +510,7 @@ const globalCashTrend = computed(() => {
           :disabled="state.player.food <= 2 * state.player.marketing_people * params.marketing_person_salary + params.marketing_person_salary"
             @click="state.player.marketing_people += 1"
           >
-            Hire Marketing Person
+            Hire Marketer
           </button>
           </div>
           <div class="col">
@@ -519,19 +529,13 @@ const globalCashTrend = computed(() => {
             <span style="margin-left: 6px;">+1 MP</span>
           </div>
           <div class="col">
-            <p>
-              <span style="margin-left: 6px;">-{{ params.billboard_price }} MP</span>
-              <template v-if="state.player.marketing_people">
-                <br>
-                Marketing People: {{ state.player.marketing_people }}
-              </template>
-            </p>
+            <span style="margin-left: 6px;">+{{printNumber(params.billboard_influence_strength*60)}} influence / second <br>-{{ params.billboard_price }} MP</span>
           </div>
           <div class="col">
             <span style="margin-left: 6px;">+1 MP / second<br> -${{ 2 * state.player.marketing_people * params.marketing_person_salary + params.marketing_person_salary }} / second</span>
           </div>
           <div class="col">
-            <span style="margin-left: 6px;">-${{ params.influencer_salary }} / second</span>
+            <span style="margin-left: 6px;">+{{printNumber(params.influencer_influence_strength*60)}} influence / second <br>-${{ params.influencer_salary }} / second</span>
           </div>
         </div>
       </div>
@@ -544,27 +548,46 @@ const globalCashTrend = computed(() => {
         <br>
       </div>
 
-      <!----------------- ECONOMY ----------------->
+      <!----------------- PLAYER ECONOMY ----------------->
 
-      <br>
       <hr>
-      <h4>Player Economy</h4>
-      <div style="display: flex; gap: 10px; margin-left: auto; margin-top: 0.5em;">
-        <button class="btn btn-primary" 
-          id="placeBubblesButton"
-          @click="placing === 'bubbles' ? placing = null : placing = 'bubbles'"
-        >Place Bubbles</button>
-        <button class="btn btn-primary" @click="bulk_place_bubbles">Mass Place Bubbles</button>
-        <button class="btn btn-primary" @click="rug_pull">Pull Rug</button>
-      </div>
+      <h4>Bubble Stockpile: {{ state.player.bubbles }}</h4>
+
+      <div class="container mt-4">
+        <!-- Grid Row for Buttons -->
+        <div class="row text-center">
+          <div class="col">
+            <button class="btn btn-primary" 
+              id="placeBubblesButton"
+              @click="placing === 'bubbles' ? placing = null : placing = 'bubbles'"
+            > Place Bubble</button>
+          </div>
+          <div class="col">
+            <button class="btn btn-primary" @click="() => bulk_place_bubbles(params.bubbles_bulk_place_amount)">Place {{ params.bubbles_bulk_place_amount }} Bubbles</button>
+          </div>
+          <div class="col">
+            <button class="btn btn-primary" @click="() => bulk_place_bubbles(2*params.bubbles_bulk_place_amount)">Place {{ 2*params.bubbles_bulk_place_amount }} Bubbles</button>
+          </div>
+          <div class="col">
+            <button class="btn btn-primary" @click="rug_pull">Pull Rug</button>
+          </div>
+        </div>
+
+        <!-- Grid Row for Text -->
+        <div class="row text-center mt-2">
+        </div>
+
+      </div>  
+
       <div v-if="activateDebugBuild">
         <button class="btn btn-primary"
             @click="state.player.food += 1000"
           >+$1000
         </button>
-        <br>
       </div>
-      <div style="margin-top: 0.5em"><span style="font-family: monospace;">Bubble Stockpile: {{ state.player.bubbles }}</span></div>
+      <div style="margin-top: 0.5em"></div>
+
+      <!---<span style="font-family: monospace;">Bubble Stockpile: {{ state.player.bubbles }}</span>--->
 
       <div class="grid-container">
         <div>
@@ -596,8 +619,8 @@ const globalCashTrend = computed(() => {
         ></polygon>
       </svg>
 
+      <!----------------- GLOBAL ECONOMY ----------------->
 
-      <br>
       <hr>
       <h4>Global Economy</h4>
 

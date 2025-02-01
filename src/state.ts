@@ -66,6 +66,7 @@ export const params = reactive({
   influencer_salary: 20,
   influencer_influence_radius: 128,
   influencer_influence_strength: 0.04,
+  popupTime: 120,
 });
 
 type CashPopup = {
@@ -257,7 +258,7 @@ export function tick(state: State): boolean {
           state.player.food += econ.bubble_value;
           state.bubbles.splice(Number(j), 1);
 
-          state.cash_popups.push({ remaining_time: 60, value: econ.bubble_value * state.deprecationFactor, pos: bubble });
+          state.cash_popups.push({ remaining_time: params.popupTime, value: econ.bubble_value * state.deprecationFactor, pos: bubble });
         }
 
         break;
